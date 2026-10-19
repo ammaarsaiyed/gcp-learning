@@ -1,0 +1,717 @@
+<title>GCP Field Atlas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a field manual. A slim masthead with section tabs, then one working surface per mode. Diagrams are drawn like engineering schematics on a faint grid. */
+:root {
+  --paper: #EEF1F5;
+  --sheet: #FFFFFF;
+  --ink: #131A2A;
+  --ink-2: #4D576B;
+  --rule: #D3D9E3;
+  --grid: #E3E8EF;
+  --accent: #1F4FB8;
+  --accent-soft: #E3EAF8;
+  --on-accent: #FFFFFF;
+  --good: #1B7A4A;
+  --good-soft: #E1F2E8;
+  --warn: #9A5B00;
+  --warn-soft: #FBEFD9;
+  --bad: #B0281F;
+  --bad-soft: #F9E3E1;
+  --c-compute: #2C64D6;
+  --c-data: #0E8A73;
+  --c-network: #6A47C9;
+  --c-identity: #B4520F;
+  --c-security: #C02A55;
+  --c-integration: #A07A00;
+  --c-ai: #1C8BB0;
+  --c-ops: #5D6A80;
+  --c-fixed: #7A8394;
+  --f-display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --radius: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0D1320; --sheet: #151C2B; --ink: #E6EAF2; --ink-2: #A3ADC0; --rule: #2A3346; --grid: #1B2333;
+    --accent: #7FA2FF; --accent-soft: #1E2A47; --on-accent: #0D1320;
+    --good: #5FD39A; --good-soft: #13301F; --warn: #F2B85A; --warn-soft: #34270F; --bad: #FF8A80; --bad-soft: #3A1714;
+    --c-compute: #7FA2FF; --c-data: #4FD1B5; --c-network: #B49CFF; --c-identity: #F3A05E; --c-security: #FF7FA3;
+    --c-integration: #E6C14F; --c-ai: #5CC8EE; --c-ops: #A3ADC0; --c-fixed: #8C95A8;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0D1320; --sheet: #151C2B; --ink: #E6EAF2; --ink-2: #A3ADC0; --rule: #2A3346; --grid: #1B2333;
+  --accent: #7FA2FF; --accent-soft: #1E2A47; --on-accent: #0D1320;
+  --good: #5FD39A; --good-soft: #13301F; --warn: #F2B85A; --warn-soft: #34270F; --bad: #FF8A80; --bad-soft: #3A1714;
+  --c-compute: #7FA2FF; --c-data: #4FD1B5; --c-network: #B49CFF; --c-identity: #F3A05E; --c-security: #FF7FA3;
+  --c-integration: #E6C14F; --c-ai: #5CC8EE; --c-ops: #A3ADC0; --c-fixed: #8C95A8;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--sheet); }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Masthead */
+.mast { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--sheet); border-bottom: 1px solid var(--rule); }
+.mast .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding-block: 10px; }
+.brand { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.brand h1 { font-family: var(--f-display); font-stretch: 80%; font-weight: 800; font-size: 1.35rem; letter-spacing: 0.01em; margin: 0; text-transform: uppercase; }
+.brand .sub { font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-2); white-space: nowrap; }
+.tabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; margin-left: auto; max-width: 100%; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { border: 0; background: transparent; padding: 8px 12px; border-radius: var(--radius); font-family: var(--f-display); font-stretch: 90%; font-weight: 600; font-size: 0.95rem; color: var(--ink-2); white-space: nowrap; }
+.tab[aria-selected="true"] { background: var(--accent); color: var(--on-accent); }
+.tab:not([aria-selected="true"]):hover { background: var(--accent-soft); color: var(--ink); }
+.sync { font-family: var(--f-mono); font-size: 0.7rem; color: var(--ink-2); }
+
+main { padding-block: 20px 64px; }
+h2 { font-family: var(--f-display); font-stretch: 85%; font-weight: 700; font-size: 1.6rem; line-height: 1.15; margin: 0 0 4px; text-wrap: balance; }
+h3 { font-family: var(--f-display); font-stretch: 90%; font-weight: 700; font-size: 1.1rem; margin: 0; text-wrap: balance; }
+.lede { color: var(--ink-2); margin: 0 0 16px; max-width: 70ch; }
+.eyebrow { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
+code { font-family: var(--f-mono); font-size: 0.85em; background: var(--accent-soft); padding: 0 4px; border-radius: 3px; overflow-wrap: anywhere; }
+.btn { border: 1px solid var(--rule); background: var(--sheet); padding: 7px 14px; border-radius: var(--radius); font-weight: 600; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.small { padding: 4px 10px; font-size: 0.85rem; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip { border: 1px solid var(--rule); background: var(--sheet); border-radius: 999px; padding: 3px 12px; font-size: 0.85rem; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.tier { font-family: var(--f-mono); font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 1px 6px; border-radius: 3px; border: 1px solid currentColor; white-space: nowrap; }
+.tier.core { color: var(--accent); }
+.tier.working { color: var(--ink-2); }
+.tier.aware { color: var(--ink-2); border-style: dashed; }
+input[type="search"], select { border: 1px solid var(--rule); background: var(--sheet); border-radius: var(--radius); padding: 7px 10px; min-width: 0; }
+.panel { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); }
+.muted { color: var(--ink-2); }
+.bar { height: 6px; background: var(--grid); border-radius: 3px; overflow: hidden; }
+.bar > span { display: block; height: 100%; background: var(--accent); }
+
+/* Atlas */
+.atlas { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 20px; align-items: start; }
+.domains { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 72px); display: flex; flex-direction: column; gap: 2px; max-height: calc(100vh - 100px); overflow-y: auto; }
+.dom { display: grid; grid-template-columns: 26px 1fr; gap: 2px 8px; text-align: left; border: 0; background: transparent; padding: 8px; border-radius: var(--radius); }
+.dom .n { font-family: var(--f-mono); font-size: 0.75rem; color: var(--ink-2); padding-top: 2px; }
+.dom .t { font-weight: 600; line-height: 1.25; }
+.dom .bar { grid-column: 2; margin-top: 4px; }
+.dom[aria-current="true"] { background: var(--sheet); box-shadow: inset 3px 0 0 var(--accent); }
+.dom:hover { background: var(--sheet); }
+.domselect { display: none; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0 16px; }
+.filters input[type="search"] { flex: 1 1 220px; }
+.concepts { display: flex; flex-direction: column; gap: 10px; }
+.concept { padding: 14px 16px; }
+.concept-head { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.concept-head h3 { flex: 1 1 240px; }
+.reveal { border: 0; background: none; color: var(--accent); font-weight: 600; padding: 0; }
+.rate { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+.rate button { border: 1px solid var(--rule); background: var(--paper); border-radius: var(--radius); padding: 4px 9px; font-size: 0.82rem; }
+.rate button[aria-pressed="true"][data-v="0"] { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+.rate button[aria-pressed="true"][data-v="1"] { background: var(--warn-soft); border-color: var(--warn); color: var(--warn); }
+.rate button[aria-pressed="true"][data-v="2"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.rate button[aria-pressed="true"][data-v="3"] { background: var(--good-soft); border-color: var(--good); color: var(--good); }
+.detail { margin-top: 12px; display: grid; gap: 10px; max-width: 78ch; }
+.detail p { margin: 0; }
+.detail .lbl { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); display: block; }
+.detail .watch { border-left: 3px solid var(--warn); padding-left: 10px; }
+.related { display: flex; flex-wrap: wrap; gap: 6px; }
+.related button { border: 0; background: var(--accent-soft); color: var(--accent); border-radius: 3px; padding: 1px 8px; font-size: 0.85rem; }
+.related span { background: var(--grid); border-radius: 3px; padding: 1px 8px; font-size: 0.85rem; color: var(--ink-2); }
+.dom-intro { max-width: 75ch; }
+
+/* Cards */
+.deck { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start; }
+.flash { padding: 24px; min-height: 320px; display: flex; flex-direction: column; gap: 14px; }
+.flash .term { font-family: var(--f-display); font-stretch: 85%; font-weight: 800; font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.1; text-wrap: balance; }
+.flash .prompt { color: var(--ink-2); }
+.grades { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: auto; }
+.grades button { padding: 10px 6px; border-radius: var(--radius); border: 1px solid var(--rule); background: var(--paper); font-weight: 700; }
+.grades button small { display: block; font-weight: 400; color: var(--ink-2); font-size: 0.75rem; }
+.grades .again { border-color: var(--bad); color: var(--bad); }
+.grades .good { border-color: var(--accent); color: var(--accent); }
+.grades .easy { border-color: var(--good); color: var(--good); }
+.side { padding: 16px; display: grid; gap: 12px; }
+.stat { display: flex; justify-content: space-between; gap: 8px; font-variant-numeric: tabular-nums; }
+.empty { padding: 28px; text-align: left; }
+
+/* Diagrams */
+.arch-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.arch-card { text-align: left; padding: 14px 16px; display: grid; gap: 6px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); }
+.arch-card:hover { border-color: var(--accent); }
+.ac-title { font-family: var(--f-display); font-stretch: 90%; font-weight: 700; font-size: 1.1rem; line-height: 1.25; }
+.arch-card p { margin: 0; color: var(--ink-2); font-size: 0.92rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.lvl { font-family: var(--f-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.arch-view { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.canvas { overflow-x: auto; background-color: var(--sheet); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 24px 24px; border: 1px solid var(--rule); border-radius: var(--radius); }
+.canvas svg { display: block; width: 100%; height: auto; }
+.node { cursor: pointer; }
+.node rect.box { fill: var(--sheet); stroke-width: 1.5; }
+.node .stripe { stroke: none; }
+.node text { fill: var(--ink); font-family: var(--f-body); font-size: 13px; font-weight: 600; }
+.node .cat { font-family: var(--f-mono); font-size: 9.5px; font-weight: 400; fill: var(--ink-2); letter-spacing: 0.05em; }
+.node.hidden text.lab { fill: var(--ink-2); font-family: var(--f-mono); font-size: 20px; font-weight: 600; }
+.node.ok rect.box { stroke: var(--good); stroke-width: 2.5; }
+.node.miss rect.box { stroke: var(--bad); stroke-width: 2.5; }
+.node.sel rect.box { stroke: var(--accent); stroke-width: 3; }
+.edge line { stroke: var(--ink-2); stroke-width: 1.4; }
+.edge circle { fill: var(--sheet); stroke: var(--ink-2); stroke-width: 1.2; }
+.edge text { fill: var(--ink); font-family: var(--f-mono); font-size: 10px; font-weight: 600; }
+.flows { margin: 0; padding: 12px 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 4px 20px; list-style: none; font-size: 0.9rem; }
+.flows li { display: grid; grid-template-columns: 24px 1fr; gap: 6px; }
+.flows b { font-family: var(--f-mono); font-size: 0.75rem; display: inline-grid; place-items: center; width: 20px; height: 20px; border: 1px solid var(--ink-2); border-radius: 50%; }
+.flows .via { color: var(--ink-2); }
+.quiz { padding: 16px; display: grid; gap: 10px; }
+.opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.opt { text-align: left; border: 1px solid var(--rule); background: var(--paper); border-radius: var(--radius); padding: 10px 12px; font-weight: 600; }
+.opt:hover:not([disabled]) { border-color: var(--accent); }
+.opt.right { border-color: var(--good); background: var(--good-soft); color: var(--good); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-soft); color: var(--bad); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-2); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.why { margin: 0; border-left: 3px solid var(--accent); padding-left: 10px; }
+
+/* Scenarios */
+.scen { padding: 22px; display: grid; gap: 14px; max-width: 860px; }
+.scen .q { font-size: 1.12rem; font-weight: 600; line-height: 1.45; }
+.scen .opts { grid-template-columns: 1fr; }
+.scen .opt { font-weight: 400; }
+.explain { background: var(--accent-soft); border-radius: var(--radius); padding: 12px 14px; }
+
+/* Progress */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.tile { padding: 14px 16px; }
+.tile .big { font-family: var(--f-display); font-stretch: 80%; font-weight: 800; font-size: 2.2rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+th { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); font-weight: 400; }
+.heat { display: inline-block; min-width: 46px; text-align: center; border-radius: 3px; padding: 1px 6px; font-weight: 600; }
+.gaps { columns: 2 280px; column-gap: 24px; padding-left: 18px; }
+.gaps li { break-inside: avoid; margin-bottom: 4px; }
+.gaps button { border: 0; background: none; padding: 0; color: var(--accent); text-align: left; }
+.confirm { display: inline-flex; gap: 8px; align-items: center; }
+
+@media (max-width: 860px) {
+  .atlas, .deck { grid-template-columns: minmax(0, 1fr); }
+  .domains { display: none; }
+  .domselect { display: block; width: 100%; }
+  .opts { grid-template-columns: 1fr; }
+  .tabs { margin-left: 0; width: 100%; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .flash, .scen, .quiz { animation: rise 0.18s ease-out; }
+  @keyframes rise { from { transform: translateY(4px); opacity: 0.6; } to { transform: none; opacity: 1; } }
+}
+</style>
+
+<header class="mast">
+  <div class="wrap">
+    <div class="brand"><h1>GCP Field Atlas</h1><span class="sub" id="sync">progress: this browser</span></div>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" data-tab="atlas">Atlas</button>
+      <button class="tab" role="tab" data-tab="cards">Flashcards</button>
+      <button class="tab" role="tab" data-tab="diagrams">Diagrams</button>
+      <button class="tab" role="tab" data-tab="scenarios">Scenarios</button>
+      <button class="tab" role="tab" data-tab="progress">Progress</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap" id="main"></main>
+
+<script>
+const DATA = /*__DATA__*/null;
+const DAY = 86400000;
+const RATINGS = ["New to me", "Heard of it", "Can explain", "Can design with"];
+const CAT_LABEL = { compute: "compute", data: "data", network: "network", identity: "identity", security: "security", integration: "integration", ai: "AI", ops: "operations", fixed: "given" };
+const CATS = Object.keys(CAT_LABEL);
+const BOX_DAYS = [0, 1, 3, 7, 16, 35];
+const KEY = "gcp-field-atlas-v1";
+
+const byId = Object.fromEntries(DATA.concepts.map(c => [c.id, c]));
+const domainById = Object.fromEntries(DATA.domains.map(d => [d.id, d]));
+const termIndex = new Map(DATA.concepts.map(c => [c.term.toLowerCase(), c.id]));
+
+function freshProgress() { return { v: 1, updated: 0, ratings: {}, srs: {}, scen: {}, arch: {} }; }
+let P = freshProgress();
+try { const s = localStorage.getItem(KEY); if (s) { const o = JSON.parse(s); if (o && o.v === 1) P = Object.assign(freshProgress(), o); } } catch (e) {}
+
+const UI = { tab: "atlas", domain: DATA.domains[0].id, tier: "all", status: "all", q: "", open: {},
+  deckDomain: "all", deckTier: "core", deckGaps: false, queue: null, qi: 0, flipped: false, done: 0,
+  arch: null, archMode: "quiz", archSel: null, archHard: false, archAns: {},
+  scenDomain: "all", scenOrder: null, scenIdx: 0, scenPicked: null, scenShuffle: null, confirmReset: false };
+
+/* ---------- helpers ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function md(s) {
+  return esc(s).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/(^|[\s(])\*([^*\s][^*]*?)\*(?=[\s).,;:]|$)/g, "$1<em>$2</em>");
+}
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function pct(n, d) { return d ? Math.round((100 * n) / d) : 0; }
+function rating(id) { return P.ratings[id]; }
+function relatedId(name) {
+  const k = name.toLowerCase();
+  if (termIndex.has(k)) return termIndex.get(k);
+  for (const [t, id] of termIndex) if (t.startsWith(k) || k.startsWith(t)) return id;
+  for (const [t, id] of termIndex) if (t.includes(k)) return id;
+  return null;
+}
+
+/* ---------- persistence: browser storage now, account storage when the viewer provides it ---------- */
+let dbRef = null, writing = false, pending = false, saveTimer = null;
+function setSync(t) { $("#sync").textContent = t; }
+function touch() {
+  P.updated = Date.now();
+  try { localStorage.setItem(KEY, JSON.stringify(P)); } catch (e) {}
+  if (dbRef) { clearTimeout(saveTimer); saveTimer = setTimeout(flush, 1500); }
+}
+async function flush() {
+  if (!dbRef) return;
+  if (writing) { pending = true; return; }
+  writing = true;
+  try { await dbRef.set(JSON.parse(JSON.stringify(P))); setSync("progress: saved to your account"); }
+  catch (e) {
+    if (e && (e.code === "invalid_argument" || e.code === "revoked" || e.code === "not_granted")) { dbRef = null; setSync("progress: this browser"); }
+    else setSync("progress: will retry saving");
+  } finally { writing = false; if (pending) { pending = false; flush(); } }
+}
+async function connect() {
+  if (!window.claude || !window.claude.use) return;
+  try {
+    const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    if (!db || !user) return;
+    const uid = await user.id();
+    if (!uid) return;
+    const ref = db.doc("data/users/" + uid + "/progress");
+    const snap = await ref.get();
+    const remote = snap.exists ? snap.data() : null;
+    if (remote && remote.v === 1 && (remote.updated || 0) > (P.updated || 0)) {
+      P = Object.assign(freshProgress(), JSON.parse(JSON.stringify(remote)));
+      try { localStorage.setItem(KEY, JSON.stringify(P)); } catch (e) {}
+      render();
+    }
+    dbRef = ref;
+    setSync("progress: saved to your account");
+    if (!remote || (P.updated || 0) > (remote.updated || 0)) { if (P.updated) flush(); }
+  } catch (e) { /* stay on browser storage */ }
+}
+
+/* ---------- tabs ---------- */
+function go(tab) {
+  UI.tab = tab;
+  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === tab)));
+  try { history.replaceState(null, "", "#" + tab); } catch (e) {}
+  render();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => go(b.dataset.tab)));
+
+function render() {
+  const m = $("#main");
+  if (UI.tab === "atlas") m.innerHTML = viewAtlas();
+  else if (UI.tab === "cards") m.innerHTML = viewCards();
+  else if (UI.tab === "diagrams") m.innerHTML = viewDiagrams();
+  else if (UI.tab === "scenarios") m.innerHTML = viewScenarios();
+  else m.innerHTML = viewProgress();
+}
+
+/* ---------- Atlas ---------- */
+function domainStats(did) {
+  const cs = DATA.concepts.filter(c => c.domain === did);
+  const known = cs.filter(c => rating(c.id) >= 2).length;
+  const rated = cs.filter(c => rating(c.id) !== undefined).length;
+  return { total: cs.length, known, rated };
+}
+function conceptMatches(c) {
+  if (c.domain !== UI.domain && !UI.q) return false;
+  if (UI.tier !== "all" && c.tier !== UI.tier) return false;
+  const r = rating(c.id);
+  if (UI.status === "unrated" && r !== undefined) return false;
+  if (UI.status === "gaps" && !(r === 0 || r === 1)) return false;
+  if (UI.status === "known" && !(r >= 2)) return false;
+  if (UI.q) {
+    const q = UI.q.toLowerCase();
+    return (c.term + " " + c.what + " " + (c.how || "") + " " + (c.gcp || "")).toLowerCase().includes(q);
+  }
+  return true;
+}
+function conceptHTML(c) {
+  const r = rating(c.id), open = UI.open[c.id];
+  const rel = c.related.map(n => { const id = relatedId(n); return id && id !== c.id ? `<button data-jump="${id}">${esc(n)}</button>` : `<span>${esc(n)}</span>`; }).join("");
+  return `<article class="panel concept" id="c-${c.id}">
+    <div class="concept-head"><h3>${esc(c.term)}</h3><span class="tier ${c.tier}">${c.tier}</span>
+      <button class="reveal" data-toggle="${c.id}" aria-expanded="${!!open}">${open ? "Hide" : "Explain it to yourself first, then show"}</button></div>
+    ${UI.q ? `<div class="eyebrow">${esc(domainById[c.domain].title)}</div>` : ""}
+    ${open ? `<div class="detail">
+      <p><span class="lbl">What</span>${md(c.what)}</p>
+      ${c.how ? `<p><span class="lbl">How it works</span>${md(c.how)}</p>` : ""}
+      ${c.gcp ? `<p><span class="lbl">On GCP</span>${md(c.gcp)}</p>` : ""}
+      ${c.why ? `<p><span class="lbl">Why it matters</span>${md(c.why)}</p>` : ""}
+      ${c.watch ? `<p class="watch"><span class="lbl">Watch out</span>${md(c.watch)}</p>` : ""}
+      ${rel ? `<div><span class="lbl">Related</span><div class="related">${rel}</div></div>` : ""}
+    </div>` : ""}
+    <div class="rate" role="group" aria-label="How well do you know ${esc(c.term)}?">
+      ${RATINGS.map((t, i) => `<button data-rate="${c.id}" data-v="${i}" aria-pressed="${r === i}">${t}</button>`).join("")}
+    </div>
+  </article>`;
+}
+function viewAtlas() {
+  const d = domainById[UI.domain];
+  const list = DATA.concepts.filter(conceptMatches);
+  const doms = DATA.domains.map(x => { const s = domainStats(x.id); return `<button class="dom" data-dom="${x.id}" aria-current="${x.id === UI.domain && !UI.q}">
+      <span class="n">${x.num}</span><span class="t">${esc(x.title)}</span>
+      <span class="bar" title="${s.known} of ${s.total} you can explain"><span style="width:${pct(s.known, s.total)}%"></span></span></button>`; }).join("");
+  const chips = (name, vals) => vals.map(([v, t]) => `<button class="chip" data-f="${name}" data-v="${v}" aria-pressed="${UI[name] === v}">${t}</button>`).join("");
+  return `<div class="atlas">
+    <nav class="domains" aria-label="Domains">${doms}</nav>
+    <section>
+      <select class="domselect" id="domselect" aria-label="Domain">${DATA.domains.map(x => `<option value="${x.id}" ${x.id === UI.domain ? "selected" : ""}>${x.num} · ${esc(x.title)}</option>`).join("")}</select>
+      ${UI.q ? `<h2>Search: “${esc(UI.q)}”</h2><p class="lede">${list.length} matching concepts across all domains.</p>`
+        : `<div class="eyebrow">Domain ${d.num} of ${DATA.domains.length}</div><h2>${esc(d.title)}</h2><p class="lede dom-intro">${md(d.intro)}</p>`}
+      <div class="filters">
+        <input type="search" id="q" placeholder="Search all ${DATA.concepts.length} concepts" value="${esc(UI.q)}" aria-label="Search concepts">
+        <div class="row">${chips("tier", [["all", "All tiers"], ["core", "Core"], ["working", "Working"], ["aware", "Aware"]])}</div>
+        <div class="row">${chips("status", [["all", "Any rating"], ["unrated", "Unrated"], ["gaps", "My gaps"], ["known", "Known"]])}</div>
+      </div>
+      <p class="muted" style="margin:0 0 12px">Read the term, explain it out loud, then open it. Rate yourself honestly. The ratings drive your gap list and the flashcard deck.</p>
+      <div class="concepts">${list.length ? list.map(conceptHTML).join("") : `<div class="panel empty">Nothing matches these filters.</div>`}</div>
+    </section></div>`;
+}
+
+/* ---------- Flashcards (Leitner-style spaced repetition) ---------- */
+function deckConcepts() {
+  return DATA.concepts.filter(c => (UI.deckDomain === "all" || c.domain === UI.deckDomain)
+    && (UI.deckTier === "all" || c.tier === UI.deckTier || (UI.deckTier === "core+working" && c.tier !== "aware"))
+    && (!UI.deckGaps || rating(c.id) === 0 || rating(c.id) === 1));
+}
+function buildQueue() {
+  const now = Date.now(), cs = deckConcepts();
+  const due = cs.filter(c => P.srs[c.id] && P.srs[c.id].due <= now).sort((a, b) => P.srs[a.id].due - P.srs[b.id].due);
+  const fresh = cs.filter(c => !P.srs[c.id]).slice(0, 15);
+  UI.queue = due.concat(fresh).map(c => c.id); UI.qi = 0; UI.flipped = false; UI.done = 0;
+}
+function gradeCard(id, g) {
+  const s = P.srs[id] || { box: 0, due: 0 }, now = Date.now();
+  let box = s.box, due;
+  if (g === "again") { box = 1; due = now + 10 * 60000; UI.queue.push(id); }
+  else if (g === "hard") { box = Math.max(1, box); due = now + DAY; }
+  else if (g === "good") { box = Math.min(5, box + 1); due = now + BOX_DAYS[box] * DAY; }
+  else { box = Math.min(5, box + 2); due = now + Math.round(BOX_DAYS[box] * 1.5) * DAY; }
+  P.srs[id] = { box, due };
+  UI.qi++; UI.done++; UI.flipped = false;
+  touch(); render();
+}
+function viewCards() {
+  if (!UI.queue) buildQueue();
+  const cs = deckConcepts(), now = Date.now();
+  const dueN = cs.filter(c => P.srs[c.id] && P.srs[c.id].due <= now).length;
+  const newN = cs.filter(c => !P.srs[c.id]).length;
+  const learned = cs.filter(c => P.srs[c.id] && P.srs[c.id].box >= 3).length;
+  const id = UI.queue[UI.qi], c = id && byId[id];
+  const opt = (v, t, cur) => `<option value="${v}" ${cur === v ? "selected" : ""}>${t}</option>`;
+  const card = c ? `<div class="panel flash">
+      <div class="row"><span class="eyebrow">${esc(domainById[c.domain].title)}</span><span class="tier ${c.tier}">${c.tier}</span><span class="muted" style="margin-left:auto;font-size:.85rem">${UI.qi + 1} of ${UI.queue.length}</span></div>
+      <div class="term">${esc(c.term)}</div>
+      ${UI.flipped ? `<div class="detail" style="margin:0">
+          <p><span class="lbl">What</span>${md(c.what)}</p>
+          ${c.how ? `<p><span class="lbl">How it works</span>${md(c.how)}</p>` : ""}
+          ${c.gcp ? `<p><span class="lbl">On GCP</span>${md(c.gcp)}</p>` : ""}
+          ${c.watch ? `<p class="watch"><span class="lbl">Watch out</span>${md(c.watch)}</p>` : ""}
+        </div>
+        <div class="grades">
+          <button class="again" data-grade="again">Again<small>10 min</small></button>
+          <button data-grade="hard">Hard<small>1 day</small></button>
+          <button class="good" data-grade="good">Good<small>${BOX_DAYS[Math.min(5, ((P.srs[c.id] || {}).box || 0) + 1)]} days</small></button>
+          <button class="easy" data-grade="easy">Easy<small>${Math.round(BOX_DAYS[Math.min(5, ((P.srs[c.id] || {}).box || 0) + 2)] * 1.5)} days</small></button>
+        </div>`
+      : `<p class="prompt">Say what it is, how it works, and where it shows up on GCP. Then reveal and grade yourself.</p>
+         <div style="margin-top:auto"><button class="btn primary" id="flip">Reveal answer</button></div>`}
+    </div>`
+    : `<div class="panel empty"><h3>${UI.done ? `Session done: ${UI.done} cards reviewed.` : "Nothing due in this deck."}</h3>
+       <p class="muted">${newN ? `${newN} new cards remain in this deck. Start another session to learn 15 more.` : "Change the deck filters to study more, or come back when cards fall due."}</p>
+       <button class="btn primary" id="newsession">Start a session</button></div>`;
+  return `<h2>Flashcards</h2><p class="lede">Spaced repetition: cards you know come back less often, and the ones you miss come back sooner. Ten minutes a day is enough.</p>
+  <div class="deck">${card}
+    <aside class="panel side">
+      <h3>Deck</h3>
+      <label class="eyebrow" for="dd">Domain</label>
+      <select id="dd">${opt("all", "All domains", UI.deckDomain)}${DATA.domains.map(d => opt(d.id, d.num + " · " + esc(d.title), UI.deckDomain)).join("")}</select>
+      <label class="eyebrow" for="dt">Tiers</label>
+      <select id="dt">${opt("core", "Core only", UI.deckTier)}${opt("core+working", "Core + working", UI.deckTier)}${opt("all", "Everything", UI.deckTier)}</select>
+      <label class="row" style="gap:6px"><input type="checkbox" id="dg" ${UI.deckGaps ? "checked" : ""}> Only concepts I rated as gaps</label>
+      <div class="stat"><span>Due now</span><strong>${dueN}</strong></div>
+      <div class="stat"><span>New</span><strong>${newN}</strong></div>
+      <div class="stat"><span>Learned (box 3+)</span><strong>${learned} / ${cs.length}</strong></div>
+      <button class="btn" id="newsession2">Restart session with these settings</button>
+    </aside></div>`;
+}
+
+/* ---------- Diagrams ---------- */
+const COLW = 212, ROWH = 116, NW = 168, NH = 64, PAD = 16;
+function wrapLabel(s, max) {
+  const words = s.split(" "), lines = []; let cur = "";
+  for (const w of words) { if ((cur + " " + w).trim().length > max && cur) { lines.push(cur); cur = w; } else cur = (cur + " " + w).trim(); }
+  if (cur) lines.push(cur);
+  return lines.slice(0, 3);
+}
+function clip(ax, ay, bx, by) { // point where segment from rect center a to b leaves rect a
+  const dx = bx - ax, dy = by - ay, hw = NW / 2 + 3, hh = NH / 2 + 3;
+  const t = Math.min(dx ? hw / Math.abs(dx) : Infinity, dy ? hh / Math.abs(dy) : Infinity);
+  return [ax + dx * t, ay + dy * t];
+}
+function archSVG(a) {
+  const cols = Math.max(...a.nodes.map(n => n.col)) + 1, rows = Math.max(...a.nodes.map(n => n.row)) + 1;
+  const W = cols * COLW + PAD * 2 - (COLW - NW), H = rows * ROWH + PAD * 2 - (ROWH - NH);
+  const pos = {}; a.nodes.forEach(n => { pos[n.id] = [PAD + n.col * COLW + NW / 2, PAD + n.row * ROWH + NH / 2]; });
+  const ans = UI.archAns;
+  const placed = [];
+  const edges = a.edges.map((e, i) => {
+    const [ax, ay] = pos[e.from], [bx, by] = pos[e.to];
+    const [x1, y1] = clip(ax, ay, bx, by), [x2, y2] = clip(bx, by, ax, ay);
+    let mx, my;
+    for (const t of [0.5, 0.32, 0.68, 0.2, 0.8]) {
+      mx = x1 + (x2 - x1) * t; my = y1 + (y2 - y1) * t;
+      if (!placed.some(([px, py]) => Math.hypot(px - mx, py - my) < 20)) break;
+    }
+    placed.push([mx, my]);
+    return `<g class="edge"><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" marker-end="url(#ah)"/><circle cx="${mx}" cy="${my}" r="9"/><text x="${mx}" y="${my + 3.5}" text-anchor="middle">${i + 1}</text></g>`;
+  }).join("");
+  const nodes = a.nodes.map(n => {
+    const x = PAD + n.col * COLW, y = PAD + n.row * ROWH, st = ans[n.id];
+    const hidden = UI.archMode === "quiz" && n.cat !== "fixed" && !st;
+    const cls = ["node", hidden ? "hidden" : "", st === "ok" ? "ok" : st === "miss" ? "miss" : "", UI.archSel === n.id ? "sel" : ""].join(" ");
+    const lines = hidden ? ["?"] : wrapLabel(n.label, 22);
+    const ty = y + NH / 2 + 4 - (lines.length - 1) * 7.5 + (hidden ? 4 : 5);
+    const text = lines.map((l, i) => `<tspan x="${x + NW / 2 + 3}" dy="${i ? 15 : 0}">${esc(l)}</tspan>`).join("");
+    return `<g class="${cls}" data-node="${n.id}" tabindex="0" role="button" aria-label="${hidden ? "Hidden " + CAT_LABEL[n.cat] + " component" : esc(n.label)}">
+      <rect class="box" x="${x}" y="${y}" width="${NW}" height="${NH}" rx="5" style="stroke:var(--c-${n.cat})"/>
+      <rect class="stripe" x="${x}" y="${y}" width="6" height="${NH}" rx="2" style="fill:var(--c-${n.cat})"/>
+      <text class="cat" x="${x + 12}" y="${y + 12}">${CAT_LABEL[n.cat].toUpperCase()}</text>
+      <text class="lab" text-anchor="middle" y="${ty}">${text}</text></g>`;
+  }).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" style="min-width:${Math.round(W * 0.78)}px" role="img" aria-label="${esc(a.title)} architecture diagram">
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--ink-2)"/></marker></defs>
+    ${edges}${nodes}</svg>`;
+}
+function norm(s) { return s.toLowerCase().replace(/\(.*?\)/g, "").replace(/[^a-z0-9]+/g, " ").trim(); }
+const POOL = (() => { const m = {}; DATA.architectures.forEach(a => a.nodes.forEach(n => { if (n.cat === "fixed") return; (m[n.cat] = m[n.cat] || new Map()).set(norm(n.label), n.label); })); return m; })();
+function optionsFor(n) {
+  const key = UI.arch + ":" + n.id;
+  if (UI.optCache && UI.optCache[key]) return UI.optCache[key];
+  const right = norm(n.label);
+  let cand = [...(POOL[n.cat] || new Map()).entries()].filter(([k]) => k !== right && !k.includes(right) && !right.includes(k)).map(([, v]) => v);
+  if (cand.length < 3) cand = cand.concat(shuffle(Object.values(POOL).flatMap(m => [...m.values()])).filter(v => norm(v) !== right && !cand.includes(v)));
+  const opts = shuffle([n.label].concat(shuffle(cand).slice(0, 3)));
+  UI.optCache = UI.optCache || {}; UI.optCache[key] = opts;
+  return opts;
+}
+function viewDiagrams() {
+  if (!UI.arch) {
+    return `<h2>Architecture diagrams</h2><p class="lede">${DATA.architectures.length} reference designs, most of them for a UK bank. Labels are hidden: work out what each box must be from the context, its category colour and the arrows, then read why it was chosen.</p>
+    <div class="arch-list">${DATA.architectures.map(a => { const s = P.arch[a.id]; return `<button class="arch-card" data-arch="${a.id}">
+      <span class="lvl" style="color:${a.level === "advanced" ? "var(--c-security)" : a.level === "core" ? "var(--accent)" : "var(--good)"}">${a.level}</span>
+      <strong class="ac-title">${esc(a.title)}</strong><p>${esc(a.context)}</p>
+      <span class="muted" style="font-size:.85rem">${a.nodes.filter(n => n.cat !== "fixed").length} components${s ? ` · best ${s.best}/${s.total}` : ""}</span></button>`; }).join("")}</div>`;
+  }
+  const a = DATA.architectures.find(x => x.id === UI.arch);
+  const quizN = a.nodes.filter(n => n.cat !== "fixed");
+  const got = quizN.filter(n => UI.archAns[n.id] === "ok").length, tried = quizN.filter(n => UI.archAns[n.id]).length;
+  const sel = UI.archSel && a.nodes.find(n => n.id === UI.archSel);
+  let panel = `<div class="panel quiz"><p class="muted" style="margin:0">${UI.archMode === "quiz" ? "Select a ? box to name it. Coloured stripes show the category." : "Select any box to read why it's there."}</p></div>`;
+  if (sel) {
+    const answered = UI.archAns[sel.id] || UI.archMode === "study" || sel.cat === "fixed";
+    if (!answered) {
+      panel = `<div class="panel quiz"><div class="eyebrow">Name this ${CAT_LABEL[sel.cat]} component</div>
+        <div class="opts">${optionsFor(sel).map(o => `<button class="opt" data-pick="${esc(o)}">${esc(o)}</button>`).join("")}</div></div>`;
+    } else {
+      const res = UI.archAns[sel.id];
+      panel = `<div class="panel quiz"><div class="row"><h3>${esc(sel.label)}</h3>${res ? `<span class="tier" style="color:var(--${res === "ok" ? "good" : "bad"})">${res === "ok" ? "correct" : "missed"}</span>` : ""}</div>
+        ${res === "miss" && UI.lastPick ? `<p class="muted" style="margin:0">You picked: ${esc(UI.lastPick)}</p>` : ""}
+        <p class="why">${md(sel.why)}</p>
+        ${conceptLink(sel.label)}</div>`;
+    }
+  }
+  return `<div class="arch-view">
+    <div class="row"><button class="btn small" id="backarch">All diagrams</button><span class="eyebrow">${a.level}</span></div>
+    <div><h2>${esc(a.title)}</h2><p class="lede" style="margin-bottom:8px">${esc(a.context)}</p></div>
+    <div class="row">
+      <button class="chip" data-amode="quiz" aria-pressed="${UI.archMode === "quiz"}">Quiz: labels hidden</button>
+      <button class="chip" data-amode="study" aria-pressed="${UI.archMode === "study"}">Study: labels shown</button>
+      ${UI.archMode === "quiz" ? `<label class="row" style="gap:6px;font-size:.9rem"><input type="checkbox" id="hard" ${UI.archHard ? "checked" : ""}> Hard mode: hide the flow list</label>
+      <span style="margin-left:auto;font-variant-numeric:tabular-nums"><strong>${got}</strong> / ${quizN.length} named${tried > got ? ` · ${tried - got} missed` : ""}</span>
+      <button class="btn small" id="revealall">Reveal all</button><button class="btn small" id="resetarch">Try again</button>` : ""}
+    </div>
+    <div class="legend">${CATS.map(c => `<span><i style="background:var(--c-${c})"></i>${CAT_LABEL[c]}</span>`).join("")}</div>
+    <figure style="margin:0"><div class="canvas">${archSVG(a)}</div>
+    <figcaption class="muted" style="font-size:.85rem;margin-top:6px">Numbered arrows show data or control flow. The list below says what moves along each one.</figcaption></figure>
+    ${UI.archHard && UI.archMode === "quiz" ? "" : `<ol class="panel flows">${a.edges.map((e, i) => `<li><b>${i + 1}</b><span>${esc(nodeName(a, e.from))} → ${esc(nodeName(a, e.to))} <span class="via">· ${esc(e.label)}</span></span></li>`).join("")}</ol>`}
+    ${panel}</div>`;
+}
+function nodeName(a, id) {
+  const n = a.nodes.find(x => x.id === id);
+  return UI.archMode === "quiz" && n.cat !== "fixed" && !UI.archAns[n.id] ? "? (" + CAT_LABEL[n.cat] + ")" : n.label;
+}
+function conceptLink(label) {
+  const base = label.replace(/\(.*?\)/g, "").trim();
+  const id = relatedId(base) || relatedId(base.split(" ").slice(0, 2).join(" "));
+  return id ? `<div><button class="btn small" data-jump="${id}">Open “${esc(byId[id].term)}” in the atlas</button></div>` : "";
+}
+function recordArch(a) {
+  const quizN = a.nodes.filter(n => n.cat !== "fixed");
+  if (quizN.every(n => UI.archAns[n.id])) {
+    const got = quizN.filter(n => UI.archAns[n.id] === "ok").length;
+    const prev = P.arch[a.id] || { best: 0, attempts: 0 };
+    P.arch[a.id] = { best: Math.max(prev.best, got), total: quizN.length, attempts: prev.attempts + 1 };
+    touch();
+  }
+}
+
+/* ---------- Scenarios ---------- */
+function scenList() { return DATA.scenarios.filter(q => UI.scenDomain === "all" || q.domain === UI.scenDomain); }
+function viewScenarios() {
+  const list = scenList();
+  if (!UI.scenOrder) { UI.scenOrder = shuffle(list.map(q => q.id)); UI.scenIdx = 0; UI.scenPicked = null; UI.scenShuffle = null; }
+  const domains = [...new Set(DATA.scenarios.map(q => q.domain))];
+  const id = UI.scenOrder[UI.scenIdx], q = DATA.scenarios.find(x => x.id === id);
+  const answered = Object.keys(P.scen).filter(k => list.some(q => q.id === k));
+  const right = answered.filter(k => P.scen[k].last).length;
+  let body;
+  if (!q) body = `<div class="panel empty"><h3>You've been through every question in this set.</h3><button class="btn primary" id="scenagain">Shuffle and go again</button></div>`;
+  else {
+    if (!UI.scenShuffle || UI.scenShuffle.id !== q.id) UI.scenShuffle = { id: q.id, opts: shuffle(q.options.map((o, i) => i)) };
+    const picked = UI.scenPicked;
+    body = `<div class="panel scen">
+      <div class="row"><span class="eyebrow">${esc(q.domain)}</span><span class="muted" style="margin-left:auto;font-size:.85rem">${UI.scenIdx + 1} of ${UI.scenOrder.length}</span></div>
+      <div class="q">${md(q.q)}</div>
+      <div class="opts">${UI.scenShuffle.opts.map(i => { const o = q.options[i]; let cls = "opt"; if (picked !== null) { if (o.correct) cls += " right"; else if (i === picked) cls += " wrong"; }
+        return `<button class="${cls}" data-ans="${i}" ${picked !== null ? "disabled" : ""}>${md(o.text)}</button>`; }).join("")}</div>
+      ${picked !== null ? `<div class="explain"><strong>${q.options[picked].correct ? "Correct." : "Not quite."}</strong> ${md(q.explain)}</div>
+        <div><button class="btn primary" id="nextq">Next question</button></div>` : ""}
+    </div>`;
+  }
+  return `<h2>Scenarios</h2><p class="lede">Design decisions in the style of the Professional exams, set in a bank. Choose before you look at the explanation.</p>
+    <div class="row" style="margin-bottom:14px">
+      <select id="sd" aria-label="Scenario topic"><option value="all">All topics (${DATA.scenarios.length})</option>${domains.map(d => `<option value="${d}" ${UI.scenDomain === d ? "selected" : ""}>${d} (${DATA.scenarios.filter(q => q.domain === d).length})</option>`).join("")}</select>
+      <span class="muted">Last-attempt accuracy in this set: <strong>${right}/${answered.length}</strong></span>
+    </div>${body}`;
+}
+
+/* ---------- Progress ---------- */
+function heatStyle(p) {
+  if (p >= 75) return "background:var(--good-soft);color:var(--good)";
+  if (p >= 40) return "background:var(--accent-soft);color:var(--accent)";
+  if (p > 0) return "background:var(--warn-soft);color:var(--warn)";
+  return "background:var(--grid);color:var(--ink-2)";
+}
+function viewProgress() {
+  const all = DATA.concepts, core = all.filter(c => c.tier === "core");
+  const rated = all.filter(c => rating(c.id) !== undefined).length;
+  const knownCore = core.filter(c => rating(c.id) >= 2).length;
+  const sAns = Object.values(P.scen), sRight = sAns.filter(s => s.last).length;
+  const archDone = Object.keys(P.arch).length;
+  const learned = Object.values(P.srs).filter(s => s.box >= 3).length;
+  const rows = DATA.domains.map(d => {
+    const cs = all.filter(c => c.domain === d.id);
+    const cell = tier => { const t = tier ? cs.filter(c => c.tier === tier) : cs; if (!t.length) return `<td class="muted">–</td>`; const p = pct(t.filter(c => rating(c.id) >= 2).length, t.length); return `<td><span class="heat" style="${heatStyle(p)}">${p}%</span></td>`; };
+    const unr = cs.filter(c => rating(c.id) === undefined).length;
+    return `<tr><td><button class="reveal" data-dom-go="${d.id}">${d.num} · ${esc(d.title)}</button></td>${cell("core")}${cell("working")}${cell("aware")}${cell(null)}<td>${unr}</td></tr>`;
+  }).join("");
+  const gaps = core.filter(c => rating(c.id) === 0 || rating(c.id) === 1);
+  return `<h2>Progress</h2><p class="lede">The atlas is the map of what matters. This page shows how much of it you can explain, based on your own ratings, and where the gaps are.</p>
+    <div class="tiles">
+      <div class="panel tile"><div class="eyebrow">Core concepts you can explain</div><div class="big">${knownCore}<span class="muted" style="font-size:1rem"> / ${core.length}</span></div></div>
+      <div class="panel tile"><div class="eyebrow">Concepts rated</div><div class="big">${rated}<span class="muted" style="font-size:1rem"> / ${all.length}</span></div></div>
+      <div class="panel tile"><div class="eyebrow">Cards learned</div><div class="big">${learned}</div></div>
+      <div class="panel tile"><div class="eyebrow">Scenario accuracy</div><div class="big">${sAns.length ? pct(sRight, sAns.length) + "%" : "–"}</div><div class="muted" style="font-size:.85rem">${sAns.length} answered</div></div>
+      <div class="panel tile"><div class="eyebrow">Diagrams completed</div><div class="big">${archDone}<span class="muted" style="font-size:1rem"> / ${DATA.architectures.length}</span></div></div>
+    </div>
+    <div class="panel" style="padding:8px 8px 4px;margin-bottom:18px"><div class="table-wrap"><table>
+      <thead><tr><th>Domain</th><th>Core</th><th>Working</th><th>Aware</th><th>All</th><th>Unrated</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <p class="muted" style="font-size:.85rem;margin:8px 10px">Each cell shows the share of concepts you rated "Can explain" or "Can design with".</p></div>
+    <h3 style="margin-bottom:8px">Core gaps to close next (${gaps.length})</h3>
+    ${gaps.length ? `<ul class="gaps">${gaps.map(c => `<li><button data-jump="${c.id}">${esc(c.term)}</button> <span class="muted" style="font-size:.85rem">${esc(domainById[c.domain].title)}</span></li>`).join("")}</ul>`
+      : `<p class="muted">No core concepts are rated as gaps yet. Rate concepts in the atlas and this list fills in.</p>`}
+    <div style="margin-top:28px" class="row">${UI.confirmReset
+      ? `<span class="confirm"><span>This erases all ratings, cards and scores.</span><button class="btn small" id="doreset" style="border-color:var(--bad);color:var(--bad)">Erase progress</button><button class="btn small" id="noreset">Keep it</button></span>`
+      : `<button class="btn small" id="askreset">Reset all progress</button>`}</div>`;
+}
+
+/* ---------- events ---------- */
+function jump(id) {
+  const c = byId[id]; if (!c) return;
+  UI.tab = "atlas"; UI.domain = c.domain; UI.q = ""; UI.tier = "all"; UI.status = "all"; UI.open[id] = true;
+  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === "atlas")));
+  render();
+  const el = document.getElementById("c-" + id); if (el) el.scrollIntoView({ block: "start" });
+}
+document.addEventListener("click", e => {
+  const t = e.target.closest("button, [data-node]"); if (!t) return;
+  const d = t.dataset;
+  if (d.dom) { UI.domain = d.dom; UI.q = ""; render(); window.scrollTo(0, 0); }
+  else if (d.domGo) { UI.domain = d.domGo; UI.q = ""; go("atlas"); }
+  else if (d.f) { UI[d.f] = d.v; render(); }
+  else if (d.toggle) { UI.open[d.toggle] = !UI.open[d.toggle]; render(); }
+  else if (d.rate) { const v = +d.v; if (P.ratings[d.rate] === v) delete P.ratings[d.rate]; else P.ratings[d.rate] = v; touch(); render(); }
+  else if (d.jump) jump(d.jump);
+  else if (t.id === "flip") { UI.flipped = true; render(); }
+  else if (d.grade) gradeCard(UI.queue[UI.qi], d.grade);
+  else if (t.id === "newsession" || t.id === "newsession2") { buildQueue(); render(); }
+  else if (d.arch) { UI.arch = d.arch; UI.archAns = {}; UI.archSel = null; UI.optCache = {}; UI.lastPick = null; render(); window.scrollTo(0, 0); }
+  else if (t.id === "backarch") { UI.arch = null; render(); }
+  else if (d.amode) { UI.archMode = d.amode; render(); }
+  else if (d.node) { UI.archSel = d.node; render(); const q = $(".quiz"); if (q && window.innerWidth < 860) q.scrollIntoView({ block: "nearest" }); }
+  else if (d.pick !== undefined) {
+    const a = DATA.architectures.find(x => x.id === UI.arch), n = a.nodes.find(x => x.id === UI.archSel);
+    UI.archAns[n.id] = d.pick === n.label ? "ok" : "miss"; UI.lastPick = d.pick; recordArch(a); render();
+  }
+  else if (t.id === "revealall") { const a = DATA.architectures.find(x => x.id === UI.arch); a.nodes.forEach(n => { if (n.cat !== "fixed" && !UI.archAns[n.id]) UI.archAns[n.id] = "miss"; }); recordArch(a); render(); }
+  else if (t.id === "resetarch") { UI.archAns = {}; UI.archSel = null; UI.optCache = {}; render(); }
+  else if (d.ans !== undefined) {
+    const q = DATA.scenarios.find(x => x.id === UI.scenOrder[UI.scenIdx]); const i = +d.ans;
+    UI.scenPicked = i; const prev = P.scen[q.id] || { n: 0, right: 0 };
+    P.scen[q.id] = { n: prev.n + 1, right: prev.right + (q.options[i].correct ? 1 : 0), last: q.options[i].correct }; touch(); render();
+  }
+  else if (t.id === "nextq") { UI.scenIdx++; UI.scenPicked = null; render(); }
+  else if (t.id === "scenagain") { UI.scenOrder = null; render(); }
+  else if (t.id === "askreset") { UI.confirmReset = true; render(); }
+  else if (t.id === "noreset") { UI.confirmReset = false; render(); }
+  else if (t.id === "doreset") { P = freshProgress(); UI.confirmReset = false; UI.queue = null; touch(); render(); }
+});
+document.addEventListener("keydown", e => {
+  const n = e.target.closest && e.target.closest("[data-node]");
+  if (n && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); n.dispatchEvent(new MouseEvent("click", { bubbles: true })); return; }
+  if (UI.tab === "cards" && !e.target.closest("input, select")) {
+    if (e.key === " " && !UI.flipped && UI.queue && UI.queue[UI.qi]) { e.preventDefault(); UI.flipped = true; render(); }
+    else if (UI.flipped && ["1", "2", "3", "4"].includes(e.key)) gradeCard(UI.queue[UI.qi], ["again", "hard", "good", "easy"][+e.key - 1]);
+  }
+});
+let qTimer;
+document.addEventListener("input", e => {
+  if (e.target.id === "q") { clearTimeout(qTimer); const v = e.target.value; qTimer = setTimeout(() => { UI.q = v.trim(); render(); const i = $("#q"); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 200); }
+});
+document.addEventListener("change", e => {
+  const id = e.target.id;
+  if (id === "domselect") { UI.domain = e.target.value; UI.q = ""; render(); }
+  else if (id === "dd") { UI.deckDomain = e.target.value; buildQueue(); render(); }
+  else if (id === "dt") { UI.deckTier = e.target.value; buildQueue(); render(); }
+  else if (id === "dg") { UI.deckGaps = e.target.checked; buildQueue(); render(); }
+  else if (id === "hard") { UI.archHard = e.target.checked; render(); }
+  else if (id === "sd") { UI.scenDomain = e.target.value; UI.scenOrder = null; render(); }
+});
+
+const start = (location.hash || "").slice(1);
+go(["atlas", "cards", "diagrams", "scenarios", "progress"].includes(start) ? start : "atlas");
+if (P.updated) setSync("progress: this browser");
+connect();
+</script>

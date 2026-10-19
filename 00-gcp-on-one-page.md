@@ -126,10 +126,10 @@ Short descriptions. ★ = learn these well this week.
 - **Cloud Audit Logs**: who did what, when
 
 **AI**
-- **Vertex AI**: build, tune and serve models
-- **Gemini models on Vertex AI**: LLMs through an API
-- **Vertex AI Agent Engine**: managed runtime for agents (ADK and others)
-- **Vector search** (Vertex AI Vector Search, AlloyDB/Cloud SQL pgvector, BigQuery vector search): similarity search for RAG
+- **Gemini Enterprise Agent Platform** (renamed from Vertex AI in April 2026): build, tune and serve models
+- **Gemini models on Agent Platform**: LLMs through an API
+- **Agent Runtime** (formerly Agent Engine): managed runtime for agents (ADK and others)
+- **Vector search** (Vector Search, AlloyDB/Cloud SQL pgvector, BigQuery vector search): similarity search for RAG
 
 **Cost**
 - ★ **Billing accounts, budgets and alerts**: who pays, and the early warning
@@ -169,4 +169,4 @@ Short descriptions. ★ = learn these well this week.
 | Container registry | ECR | ACR | **Artifact Registry** |
 | CI/CD | CodeBuild / CodePipeline | Azure DevOps | **Cloud Build / Cloud Deploy** |
 | IaC | CloudFormation | Bicep / ARM | **Terraform / Infrastructure Manager** |
-| ML / GenAI | SageMaker / Bedrock | Azure ML / AI Foundry | **Vertex AI** |
+| ML / GenAI | SageMaker / Bedrock | Azure ML / AI Foundry | **Gemini Enterprise Agent Platform (ex-Vertex AI)** |

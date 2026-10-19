@@ -207,5 +207,5 @@ Compare: how many concepts did GKE need (cluster, deployment, replicas, service,
 ## Work tie-in
 
 - Where do your team's workloads run? Find them: `gcloud run services list`, `gcloud container clusters list`, `gcloud compute instances list` (in a work project, read-only).
-- If you build ADK agents: is the agent served from Cloud Run, GKE or Vertex AI Agent Engine? Which service account does it run as, and what roles does that service account have?
+- If you build ADK agents: is the agent served from Cloud Run, GKE or Agent Runtime (formerly Vertex AI Agent Engine)? Which service account does it run as, and what roles does that service account have?
 - Find your CI/CD: Cloud Build triggers? GitHub Actions? Where do images live?

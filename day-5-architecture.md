@@ -16,7 +16,7 @@ Today has a different shape: **30 min read → 90 min design drills → 30 min b
                   Non-functional: latency, availability (SLO), RTO/RPO, data residency, compliance, budget, team skills
 2. LENSES         Walk the 8 lenses (solution-design-template.md) and pick a service per lens with the decision trees
 3. NFR PASS       Check the design against the Well-Architected pillars:
-                  operational excellence · security · reliability · cost · performance
+                  operational excellence · security · reliability · cost · performance · sustainability
 4. TRADE-OFFS     State what you gave up ("Cloud SQL over Spanner: cheaper, but single-region writes")
 5. DIAGRAM        Boxes = services, arrows = data flow, labeled with protocol and identity
 ```
@@ -73,12 +73,12 @@ Batch:     Sources ─► GCS (landing) ─► Dataflow/Dataproc or BigQuery SQL
 **P5. GenAI / agent application (RAG + tools)**
 ```
 Users ─► IAP or Identity Platform ─► Frontend (Cloud Run)
-              ─► Agent (ADK) on Vertex AI Agent Engine or Cloud Run ─┬─► Gemini on Vertex AI (reasoning)
+              ─► Agent (ADK) on Agent Runtime or Cloud Run ─┬─► Gemini on Agent Platform (reasoning)
                                                                        ├─► Retrieval: vector search (AlloyDB pgvector /
-                                                                       │    Vertex AI Vector Search / BigQuery vector search)
+                                                                       │    Vector Search / BigQuery vector search)       
                                                                        ├─► Tools: internal APIs (Cloud Run), BigQuery, A2A to other agents
-                                                                       └─► Session/memory state (Agent Engine sessions / Firestore)
-Ingestion: docs in GCS ─► Eventarc ─► Cloud Run job (chunk, embed with Vertex AI embeddings) ─► vector store
+                                                                       └─► Session/memory state (Agent Runtime sessions / Firestore)
+Ingestion: docs in GCS ─► Eventarc ─► Cloud Run job (chunk, embed with Agent Platform embeddings) ─► vector store
 Guardrails: service account per agent with least privilege on its tools, Secret Manager, VPC-SC around data, Cloud Trace for agent steps, evaluation datasets
 ```
 
@@ -189,7 +189,7 @@ A bank wants data scientists to analyze customer transactions. PII must not leav
 - **Guardrails:** Org Policy `gcp.resourceLocations` = EU only; disable service account key creation.
 - **Data:** BigQuery datasets in the EU multi-region; **CMEK** with Cloud KMS; **Sensitive Data Protection** to find and de-identify PII; **policy tags** (column-level security) and row-level security; authorized views for curated access.
 - **Perimeter:** **VPC Service Controls** around the BigQuery/GCS projects, which blocks exfiltration to outside projects even with valid credentials.
-- **Identity:** groups → predefined BigQuery roles at the dataset level; analysts use Vertex AI Workbench inside the perimeter; IAP/BeyondCorp context-aware access (managed devices only).
+- **Identity:** groups → predefined BigQuery roles at the dataset level; analysts use Agent Platform Workbench (formerly Vertex AI Workbench) inside the perimeter; IAP/BeyondCorp context-aware access (managed devices only).
 - **Audit:** **Data Access audit logs** enabled, aggregated by a log sink into a locked logging project; Security Command Center.
 - **Trade-off:** VPC-SC adds operational friction (perimeter bridges, ingress/egress rules), but it's the only control that addresses insider exfiltration.
 </details>
@@ -200,12 +200,12 @@ The company wants an assistant for employees that answers from internal docs (ar
 <details><summary>Model answer</summary>
 
 - **Access:** frontend on Cloud Run behind **IAP** (Google identities, employees only).
-- **Agent:** built with **ADK**, deployed on **Vertex AI Agent Engine** (managed sessions, scaling) or Cloud Run (more control). **Gemini on Vertex AI** as the model.
-- **Retrieval (RAG):** ingestion pipeline: new doc in GCS → Eventarc → Cloud Run job parses and chunks → **Vertex AI embeddings** → vector store (**AlloyDB pgvector** if you also want SQL and filters, **Vertex AI Vector Search** for very large scale, BigQuery vector search for analytics-heavy cases). Store chunk → source URI so the answer can cite it. A managed alternative is Vertex AI Search.
+- **Agent:** built with **ADK**, deployed on **Agent Runtime** (formerly Vertex AI Agent Engine; managed sessions, scaling) or Cloud Run (more control). **Gemini on Agent Platform** (formerly Vertex AI) as the model.
+- **Retrieval (RAG):** ingestion pipeline: new doc in GCS → Eventarc → Cloud Run job parses and chunks → **Agent Platform embeddings** → vector store (**AlloyDB pgvector** if you also want SQL and filters, **Vector Search** for very large scale, BigQuery vector search for analytics-heavy cases). Store chunk → source URI so the answer can cite it. A managed alternative is Agent Search (formerly Vertex AI Search).
 - **Tools:** the ticket API is a tool; the agent's **own service account** has only the role needed to call that API (Cloud Run invoker on that service). Other agents can be reached over A2A.
 - **Security:** document-level ACLs enforced at retrieval time (filter by the user's groups), Secret Manager, VPC-SC around the data, and prompt-injection and response screening (for example Model Armor).
 - **Ops:** Cloud Trace / Logging of agent steps and tool calls, an evaluation set of question → expected answer, token cost dashboards.
-- **Trade-off:** Agent Engine means less infrastructure to run, while Cloud Run gives you full control of the runtime and networking.
+- **Trade-off:** Agent Runtime means less infrastructure to run, while Cloud Run gives you full control of the runtime and networking.
 </details>
 
 ### Drill 6: Global game backend
@@ -260,5 +260,5 @@ Whatever you couldn't reproduce becomes flashcards.
 |---|---|
 | 2 | Flashcards every day. Re-do the Day 3 lab from memory in a new project (no copy-paste). |
 | 3 | Pick a work task and write a one-page design doc using the template before you start. |
-| 4 | Go deep on your stack (for example GKE, Agent Engine, BigQuery). Read its "best practices" docs page. |
+| 4 | Go deep on your stack (for example GKE, Agent Runtime, BigQuery). Read its "best practices" docs page. |
 | 5 | Open the ACE exam guide and tick what you can do. Go deeper only on the gaps that matter at work. |
