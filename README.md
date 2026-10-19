@@ -8,6 +8,8 @@ A focused but complete way to learn Google Cloud for someone who learns on the j
 
 | Part | What it is | Use it for |
 |---|---|---|
+| [**How to architect**](guide/01-how-to-architect.md) · [**Journeys**](guide/02-end-to-end-journeys.md) · [**Worked designs and case studies**](guide/03-worked-designs-and-case-studies.md) · [**Practice resources**](guide/04-practice-resources.md) | Reading on **putting the pieces together**: the design loop, the "if you choose X you must handle Y" knock-on map, failure walks, the questions a bank review board asks, 9 end-to-end journeys (request, identity, data, deployment, failure, agent, network, latency, egress), a full worked AI-underwriting design, Google's 4 official architect case studies analysed, and curated online practice | **Integration, the most important part.** Read 01 first |
+| **Architect section of the app** | Journeys you step through on highlighted diagrams, a **design lab** (7 briefs, 58 decisions with graded feedback and requirement twists, plus your design and a reference design built as you go), and **design reviews** (8 flawed proposals: find the real problems, ignore the red herrings) | Practising architecture interactively |
 | [**Concept atlas**](atlas/README.md) | 401 concepts in 13 domains, from TCP handshakes to PRA SS1/23. Each has *What*, *How it works*, *On GCP* and *Watch out*, at three tiers (core / working / aware). | **Depth and completeness.** This is the map of what matters. |
 | [**Practice app**](app/index.html) | An interactive page: rate yourself on every concept, spaced-repetition flashcards, **18 architecture diagrams with hidden labels** to name, 63 scenario questions, and a progress view showing your gaps. | **Active recall.** It replaces re-reading and re-watching. |
 | [**Architecture library**](practice/architectures.md) | The same 18 designs as text: each component, and why it was chosen. Most are bank or AI scenarios (RAG assistant, fraud scoring, agentic servicing with MCP/A2A, Open Banking, VPC-SC data science, hybrid landing zone…). | Learning to *see* solutions. |
@@ -36,13 +38,13 @@ The things you listed (perimeters, gRPC, ingress/egress, Apigee, ports, handshak
 
 Each day covers the **core** concepts of its domains carefully and skims *working* and *aware*. Day 5 brings everything together through architecture.
 
-| Day | Atlas domains | Practice |
-|---|---|---|
-| **1** | [One-pager](00-gcp-on-one-page.md) · [01 Networking fundamentals](atlas/01-networking-fundamentals.md) · [03 Identity and access](atlas/03-identity-and-access.md) · [10 Governance and cost](atlas/10-governance-and-cost.md) (hierarchy, billing, regions, Well-Architected) | Diagram: *Static site and API* · scenarios: identity, governance |
-| **2** | [02 GCP networking](atlas/02-gcp-networking.md) · [04 Security and compliance](atlas/04-security-and-compliance.md) | Diagrams: *Hybrid landing zone*, *Controlled egress*, *Secure data science* · scenarios: networking, security |
-| **3** | [05 Compute and containers](atlas/05-compute-and-containers.md) · [06 Storage and databases](atlas/06-storage-and-databases.md) · [07 Data processing](atlas/07-data-processing-and-messaging.md) | Diagrams: *Three-tier HA*, *GKE mesh platform*, *CDC lakehouse*, *Real-time fraud* · scenarios: compute, data |
-| **4** | [08 APIs and service communication](atlas/08-apis-and-service-communication.md) · [09 Reliability and operations](atlas/09-reliability-and-operations.md) · [11 Migration and hybrid](atlas/11-migration-and-hybrid.md) | Diagrams: *Mobile banking API*, *KYC onboarding*, *Active-active payments*, *Secure CI/CD*, *Central logging*, *Open Banking* · scenarios: integration, reliability, migration |
-| **5** | [12 AI, ML and agents](atlas/12-ai-ml-and-genai.md) · [13 UK banking regulation](atlas/13-uk-banking-regulation-and-risk.md) | Diagrams: *RAG assistant*, *Agentic servicing*, *Private Gemini from on-prem*, *Credit-risk MLOps* · scenarios: AI, regulation · then [Day 5 design drills](day-5-architecture.md#design-drills-90-min) |
+| Day | Atlas domains (the pieces) | Put it together (Architect section) | Extra practice |
+|---|---|---|---|
+| **1** | [One-pager](00-gcp-on-one-page.md) · [01 Networking fundamentals](atlas/01-networking-fundamentals.md) · [03 Identity and access](atlas/03-identity-and-access.md) · [10 Governance and cost](atlas/10-governance-and-cost.md) | Read [How to architect](guide/01-how-to-architect.md) §1–5 · Journey: *Who is calling?* · Review: *"Quick win" GenAI pilot* | Diagram: *Static site and API* · scenarios: identity, governance |
+| **2** | [02 GCP networking](atlas/02-gcp-networking.md) · [04 Security and compliance](atlas/04-security-and-compliance.md) | Journeys: *On-prem app calls Gemini privately*, *One outbound call, fully controlled* · Lab: *Lift-and-shift* · Review: *Hybrid network* | Diagrams: *Hybrid landing zone*, *Secure data science* · scenarios: networking, security |
+| **3** | [05 Compute and containers](atlas/05-compute-and-containers.md) · [06 Storage and databases](atlas/06-storage-and-databases.md) · [07 Data processing](atlas/07-data-processing-and-messaging.md) | Journeys: *Core banking to a regulator's report*, *Scoring a payment in 100 ms* · Labs: *Real-time fraud*, *Governed analytics* · Review: *Self-service analytics* | Diagrams: *Three-tier HA*, *GKE mesh* · scenarios: compute, data |
+| **4** | [08 APIs and communication](atlas/08-apis-and-service-communication.md) · [09 Reliability and operations](atlas/09-reliability-and-operations.md) · [11 Migration](atlas/11-migration-and-hybrid.md) | Read §6–7 (knock-on map, failure walk) · Journeys: *Customer adds a payee and pays*, *A zone fails, then a region*, *A code change reaches production* · Labs: *Mobile payments*, *Partner API* · Reviews: *Payments "with HA"*, *DR plan*, *Delivery pipeline*, *KYC intake* | Diagrams: *Active-active payments*, *Open Banking* · scenarios: integration, reliability |
+| **5** | [12 AI, ML and agents](atlas/12-ai-ml-and-genai.md) · [13 UK banking regulation](atlas/13-uk-banking-regulation-and-risk.md) | Read §8–10 + the [worked mortgage design](guide/03-worked-designs-and-case-studies.md) · Journey: *An agent's task* · Labs: *Policy assistant (RAG)*, *Servicing agent* · Review: *Servicing agent v0.1* · then one [Google case study](guide/03-worked-designs-and-case-studies.md#part-2-googles-professional-cloud-architect-case-studies), designed by you first | Diagrams: *RAG assistant*, *Agentic servicing*, *Credit-risk MLOps* · scenarios: AI, regulation |
 
 ### The daily loop
 
@@ -52,26 +54,28 @@ Each day covers the **core** concepts of its domains carefully and skims *workin
                          what it is, then rate yourself. Don't open the answers yet
  0:45  Close gaps (60m)  Filter to "My gaps". Open each one, read it properly, follow the Related links,
                          then re-rate. This is where the depth comes from
- 1:45  Apply      (40m)  Today's diagrams in quiz mode (labels hidden), then today's scenario questions
+ 1:45  Combine    (40m)  Architect section: today's journey, then design lab, then review. This is the most
+                         important block. Reading builds the pieces, and this builds the skill of combining them
  2:25  Recall     (20m)  Blank page: draw one of today's diagrams from memory and label every arrow.
                          Write 5 lines on what surprised you
  2:45  Work       (15m)  Find one of today's concepts in your bank's real environment or design docs
 ```
 
-Why this works when courses didn't: you **recall before you read** (that's what makes memory stick), you only spend reading time on **your actual gaps**, and the diagrams and scenarios make you **use** the knowledge, which is what architecture reviews will ask of you.
+Why this works when courses didn't: you **recall before you read** (that's what makes memory stick), you only spend reading time on **your actual gaps**, and the journeys, labs and reviews make you **combine** the knowledge, which is what architecture reviews will ask of you. Fit the extra-practice column (diagram quizzes, scenarios) into the warm-up or the commute.
 
 ### After the week
 
 - **Daily, 10 minutes:** due flashcards in the app (or Anki).
-- **Weekly:** one diagram in hard mode (flow list hidden), and re-rate one domain.
+- **Weekly:** one design lab or review, one Architecture Center kata (see [practice resources](guide/04-practice-resources.md)), and re-rate one domain.
 - **Each design you touch at work:** run it through the [solution design template](cheatsheets/solution-design-template.md) and the 8 lenses before the review.
 - **When you have time to build:** the `day-*.md` labs walk you through deploying a Cloud Run app with Firestore, Pub/Sub, BigQuery, Secret Manager and private networking. That's when the knowledge becomes muscle memory.
 
 ## Repository layout
 
 ```
+guide/        how to architect, end-to-end journeys, worked designs + case studies, practice resources
 atlas/        13 domain files + generated index (the depth)
-practice/     architectures.md, scenarios.md, week1-cards.csv (practice sources)
+practice/     architectures.md, scenarios.md, design-lab.md, design-reviews.md, week1-cards.csv
 app/          template.html (source) → index.html (built practice app)
 tools/        build.py: rebuilds app/index.html, atlas/README.md, flashcards.csv
 cheatsheets/  decision trees, solution design template, gcloud patterns

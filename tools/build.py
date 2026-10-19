@@ -114,6 +114,137 @@ def parse_scenarios():
     return qs
 
 
+def _field(rest, key):
+    m = re.search(rf"^{key}:\s*(.+)$", rest, re.M)
+    return m.group(1).strip() if m else ""
+
+
+def _section(rest, start, ends):
+    if f"\n{start}:\n" not in "\n" + rest:
+        return ""
+    body = ("\n" + rest).split(f"\n{start}:\n", 1)[1]
+    cut = len(body)
+    for e in ends:
+        i = body.find(f"\n{e}")
+        if i != -1:
+            cut = min(cut, i)
+    return body[:cut]
+
+
+def _nodes(txt, where):
+    nodes = []
+    for ln in txt.strip().split("\n"):
+        if not ln.strip().startswith("-"):
+            continue
+        parts = [p.strip() for p in ln.strip()[1:].split("|")]
+        if len(parts) < 4:
+            sys.exit(f"{where}: bad node line {ln!r}")
+        col, row = (int(x) for x in parts[3].split(","))
+        nodes.append({"id": parts[0], "label": parts[1], "cat": parts[2], "col": col, "row": row,
+                      "why": "|".join(parts[4:]).strip()})
+    seen = {}
+    for n in nodes:
+        k = (n["col"], n["row"])
+        if k in seen:
+            sys.exit(f"{where}: nodes {seen[k]} and {n['id']} overlap at {k}")
+        seen[k] = n["id"]
+    return nodes
+
+
+def _edges(txt, ids, where):
+    edges = []
+    for ln in txt.strip().split("\n"):
+        if not ln.strip().startswith("-"):
+            continue
+        m = re.match(r"-\s*(\S+)\s*>\s*(\S+)\s*\|\s*(.+)$", ln.strip())
+        if not m or m.group(1) not in ids or m.group(2) not in ids:
+            sys.exit(f"{where}: bad edge {ln!r}")
+        edges.append({"from": m.group(1), "to": m.group(2), "label": m.group(3).strip()})
+    return edges
+
+
+def parse_journeys(archs):
+    text = open(os.path.join(ROOT, "guide", "02-end-to-end-journeys.md"), encoding="utf-8").read()
+    amap = {a["id"]: a for a in archs}
+    out = []
+    for block in re.split(r"^## Journey: ", text, flags=re.M)[1:]:
+        title, rest = block.split("\n", 1)
+        arch = _field(rest, "arch")
+        if arch not in amap:
+            sys.exit(f"journey '{title}': unknown arch {arch}")
+        ids = {n["id"] for n in amap[arch]["nodes"]}
+        steps = []
+        for ln in _section(rest, "steps", ["## "]).strip().split("\n"):
+            if not ln.startswith("- "):
+                continue
+            nodes_s, txt = ln[2:].split("|", 1)
+            hl = [x.strip() for x in nodes_s.split(",") if x.strip()]
+            bad = [x for x in hl if x not in ids]
+            if bad:
+                sys.exit(f"journey '{title}': unknown nodes {bad}")
+            steps.append({"nodes": hl, "text": txt.strip()})
+        out.append({"id": _field(rest, "id"), "title": title.strip(), "arch": arch,
+                    "lesson": _field(rest, "lesson"), "steps": steps})
+    return out
+
+
+def parse_labs():
+    text = open(os.path.join(ROOT, "practice", "design-lab.md"), encoding="utf-8").read()
+    labs = []
+    for block in re.split(r"^## Lab: ", text, flags=re.M)[1:]:
+        title, rest = block.split("\n", 1)
+        where = f"lab '{title.strip()}'"
+        reqs = [l[2:].strip() for l in _section(rest, "requirements", ["slots:"]).split("\n") if l.startswith("- ")]
+        slots = _nodes(_section(rest, "slots", ["edges:"]), where)
+        ids = {n["id"] for n in slots}
+        edges = _edges(_section(rest, "edges", ["steps:"]), ids, where)
+        steps = []
+        for sb in re.split(r"^### ", rest.split("\nsteps:\n", 1)[1], flags=re.M)[1:]:
+            head, body = sb.split("\n", 1)
+            m = re.match(r"(Step|Twist): (.+?)\s*\|\s*slot:\s*(\S+)", head)
+            if not m or m.group(3) not in ids:
+                sys.exit(f"{where}: bad step header {head!r}")
+            opts = []
+            for ln in body.split("\n"):
+                om = re.match(r"- (best|ok|poor) \| (.+?) \| (.+)$", ln.strip())
+                if om:
+                    opts.append({"grade": om.group(1), "label": om.group(2).strip(), "feedback": om.group(3).strip()})
+            if not any(o["grade"] == "best" for o in opts):
+                sys.exit(f"{where}: step {head!r} has no best option")
+            steps.append({"kind": m.group(1).lower(), "title": m.group(2).strip(), "slot": m.group(3),
+                          "question": _field(body, "question"), "options": opts})
+        labs.append({"id": _field(rest, "id"), "title": title.strip(), "brief": _field(rest, "brief"),
+                     "requirements": reqs, "slots": slots, "edges": edges, "steps": steps})
+    return labs
+
+
+def parse_reviews():
+    text = open(os.path.join(ROOT, "practice", "design-reviews.md"), encoding="utf-8").read()
+    revs = []
+    for block in re.split(r"^## Review: ", text, flags=re.M)[1:]:
+        title, rest = block.split("\n", 1)
+        where = f"review '{title.strip()}'"
+        nodes = _nodes(_section(rest, "nodes", ["edges:"]), where)
+        edges = _edges(_section(rest, "edges", ["issues:"]), {n["id"] for n in nodes}, where)
+        issues = []
+        for ln in _section(rest, "issues", ["## "]).split("\n"):
+            im = re.match(r"- \[( |x)\] (.+?) \| (.+)$", ln.strip())
+            if im:
+                issues.append({"real": im.group(1) == "x", "text": im.group(2).strip(), "explain": im.group(3).strip()})
+        revs.append({"id": _field(rest, "id"), "title": title.strip(), "design": _field(rest, "design"),
+                     "nodes": nodes, "edges": edges, "issues": issues})
+    return revs
+
+
+def read_guides():
+    out = []
+    for path in sorted(glob.glob(os.path.join(ROOT, "guide", "0[134]-*.md"))):
+        md = open(path, encoding="utf-8").read()
+        title = re.search(r"^# (.+)$", md, re.M).group(1).strip()
+        out.append({"id": os.path.basename(path)[:2], "title": title, "md": md})
+    return out
+
+
 def strip_md(s):
     s = re.sub(r"\*\*(.+?)\*\*", r"\1", s)
     return re.sub(r"`(.+?)`", r"\1", s)
@@ -164,7 +295,9 @@ def main():
     write_atlas_index(domains, concepts)
     archs = parse_architectures()
     qs = parse_scenarios()
-    data = {"domains": domains, "concepts": concepts, "architectures": archs, "scenarios": qs}
+    journeys, labs, reviews, guides = parse_journeys(archs), parse_labs(), parse_reviews(), read_guides()
+    data = {"domains": domains, "concepts": concepts, "architectures": archs, "scenarios": qs,
+            "journeys": journeys, "labs": labs, "reviews": reviews, "guides": guides}
     tpl = open(os.path.join(ROOT, "app", "template.html"), encoding="utf-8").read()
     payload = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
     html = tpl.replace("/*__DATA__*/null", payload)
@@ -172,7 +305,8 @@ def main():
     n_cards = write_flashcards(concepts)
     tiers = {t: sum(c["tier"] == t for c in concepts) for t in ("core", "working", "aware")}
     print(f"{len(domains)} domains, {len(concepts)} concepts {tiers}, {len(archs)} architectures, "
-          f"{len(qs)} scenarios, {n_cards} flashcards")
+          f"{len(qs)} scenarios, {n_cards} flashcards, {len(journeys)} journeys, {len(labs)} labs "
+          f"({sum(len(l['steps']) for l in labs)} decisions), {len(reviews)} reviews, {len(guides)} guides")
 
 
 if __name__ == "__main__":

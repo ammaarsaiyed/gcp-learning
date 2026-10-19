@@ -201,6 +201,54 @@ th { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.06em; text
 .gaps button { border: 0; background: none; padding: 0; color: var(--accent); text-align: left; }
 .confirm { display: inline-flex; gap: 8px; align-items: center; }
 
+/* Architect */
+.ax-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.ax-card { text-align: left; padding: 18px; display: grid; gap: 8px; align-content: start; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); }
+.ax-card:hover { border-color: var(--accent); }
+.ax-card p { margin: 0; color: var(--ink-2); font-size: 0.95rem; }
+.node.dim { opacity: 0.25; }
+.node.on rect.box { stroke-width: 3.5; }
+.edge.dim { opacity: 0.15; }
+.edge.on line { stroke: var(--accent); stroke-width: 2.4; }
+.edge.on circle { stroke: var(--accent); }
+.node.slot rect.box { stroke-dasharray: 5 4; }
+.jstep { padding: 18px; display: grid; gap: 12px; margin-top: 14px; }
+.jtext { margin: 0; font-size: 1.05rem; max-width: 80ch; }
+.dots { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--ink-2); background: transparent; padding: 0; }
+.dot.past { background: var(--accent-soft); border-color: var(--accent); }
+.dot.cur { background: var(--accent); border-color: var(--accent); }
+.brief { background: var(--sheet); border: 1px solid var(--rule); border-left: 4px solid var(--accent); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 14px; max-width: 900px; }
+.brief ul { margin: 8px 0 0; padding-left: 20px; }
+.twist { border-color: var(--warn); box-shadow: inset 4px 0 0 var(--warn); }
+.lab-opts { grid-template-columns: 1fr; }
+.fb { border: 1px solid var(--rule); border-radius: var(--radius); padding: 10px 12px; background: var(--paper); }
+.fb p { margin: 6px 0 0; }
+.fb.mine { box-shadow: 0 0 0 2px var(--ink); }
+.gchip { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 7px; border-radius: 3px; }
+.gchip.best { background: var(--good-soft); color: var(--good); }
+.gchip.ok { background: var(--warn-soft); color: var(--warn); }
+.gchip.poor { background: var(--bad-soft); color: var(--bad); }
+.review-items { display: grid; gap: 8px; }
+.chk { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: start; padding: 10px 12px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper); cursor: pointer; }
+.chk input { margin-top: 4px; }
+.prose { padding: 20px 24px; max-width: 980px; }
+.prose h2 { margin-top: 0; font-size: 1.8rem; }
+.prose h3 { margin: 26px 0 8px; font-size: 1.3rem; }
+.prose h4 { margin: 18px 0 6px; font-family: var(--f-display); font-stretch: 90%; font-size: 1.05rem; }
+.prose p, .prose li { max-width: 78ch; }
+.prose pre { background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius); padding: 12px; overflow-x: auto; font-family: var(--f-mono); font-size: 0.78rem; line-height: 1.45; }
+.prose pre code { background: none; padding: 0; }
+.prose blockquote { margin: 12px 0; padding: 8px 14px; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 var(--radius) var(--radius) 0; }
+.prose table { font-size: 0.92rem; }
+.prose td, .prose th { vertical-align: top; }
+.prose hr { border: 0; border-top: 1px solid var(--rule); margin: 24px 0; }
+.prose details { display: inline; }
+.prose summary { display: inline; cursor: pointer; color: var(--accent); font-weight: 600; }
+.prose details[open] { display: block; margin-top: 6px; padding: 8px 12px; background: var(--paper); border-radius: var(--radius); }
+.xref { font-weight: 600; }
+.linkish { border: 0; background: none; padding: 0; color: var(--accent); font-weight: 600; text-decoration: underline; }
+
 @media (max-width: 860px) {
   .atlas, .deck { grid-template-columns: minmax(0, 1fr); }
   .domains { display: none; }
@@ -218,6 +266,7 @@ th { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.06em; text
   <div class="wrap">
     <div class="brand"><h1>GCP Field Atlas</h1><span class="sub" id="sync">progress: this browser</span></div>
     <nav class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" data-tab="architect">Architect</button>
       <button class="tab" role="tab" data-tab="atlas">Atlas</button>
       <button class="tab" role="tab" data-tab="cards">Flashcards</button>
       <button class="tab" role="tab" data-tab="diagrams">Diagrams</button>
@@ -241,7 +290,7 @@ const byId = Object.fromEntries(DATA.concepts.map(c => [c.id, c]));
 const domainById = Object.fromEntries(DATA.domains.map(d => [d.id, d]));
 const termIndex = new Map(DATA.concepts.map(c => [c.term.toLowerCase(), c.id]));
 
-function freshProgress() { return { v: 1, updated: 0, ratings: {}, srs: {}, scen: {}, arch: {} }; }
+function freshProgress() { return { v: 1, updated: 0, ratings: {}, srs: {}, scen: {}, arch: {}, labs: {}, reviews: {}, journeys: {} }; }
 let P = freshProgress();
 try { const s = localStorage.getItem(KEY); if (s) { const o = JSON.parse(s); if (o && o.v === 1) P = Object.assign(freshProgress(), o); } } catch (e) {}
 
@@ -309,6 +358,7 @@ async function connect() {
 
 /* ---------- tabs ---------- */
 function go(tab) {
+  if (tab === "architect" && UI.tab === "architect" && typeof AX !== "undefined") AX.view = "home";
   UI.tab = tab;
   document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === tab)));
   try { history.replaceState(null, "", "#" + tab); } catch (e) {}
@@ -319,7 +369,8 @@ document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () =>
 
 function render() {
   const m = $("#main");
-  if (UI.tab === "atlas") m.innerHTML = viewAtlas();
+  if (UI.tab === "architect") m.innerHTML = viewArchitect();
+  else if (UI.tab === "atlas") m.innerHTML = viewAtlas();
   else if (UI.tab === "cards") m.innerHTML = viewCards();
   else if (UI.tab === "diagrams") m.innerHTML = viewDiagrams();
   else if (UI.tab === "scenarios") m.innerHTML = viewScenarios();
@@ -470,13 +521,13 @@ function clip(ax, ay, bx, by) { // point where segment from rect center a to b l
   const t = Math.min(dx ? hw / Math.abs(dx) : Infinity, dy ? hh / Math.abs(dy) : Infinity);
   return [ax + dx * t, ay + dy * t];
 }
-function archSVG(a) {
-  const cols = Math.max(...a.nodes.map(n => n.col)) + 1, rows = Math.max(...a.nodes.map(n => n.row)) + 1;
+function drawDiagram(nodes, edges, o) {
+  // o: { title, hidden(n), cls(n), label(n), hi: Set|null }
+  const cols = Math.max(...nodes.map(n => n.col)) + 1, rows = Math.max(...nodes.map(n => n.row)) + 1;
   const W = cols * COLW + PAD * 2 - (COLW - NW), H = rows * ROWH + PAD * 2 - (ROWH - NH);
-  const pos = {}; a.nodes.forEach(n => { pos[n.id] = [PAD + n.col * COLW + NW / 2, PAD + n.row * ROWH + NH / 2]; });
-  const ans = UI.archAns;
-  const placed = [];
-  const edges = a.edges.map((e, i) => {
+  const pos = {}; nodes.forEach(n => { pos[n.id] = [PAD + n.col * COLW + NW / 2, PAD + n.row * ROWH + NH / 2]; });
+  const hi = o.hi || null, placed = [];
+  const es = edges.map((e, i) => {
     const [ax, ay] = pos[e.from], [bx, by] = pos[e.to];
     const [x1, y1] = clip(ax, ay, bx, by), [x2, y2] = clip(bx, by, ax, ay);
     let mx, my;
@@ -485,24 +536,32 @@ function archSVG(a) {
       if (!placed.some(([px, py]) => Math.hypot(px - mx, py - my) < 20)) break;
     }
     placed.push([mx, my]);
-    return `<g class="edge"><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" marker-end="url(#ah)"/><circle cx="${mx}" cy="${my}" r="9"/><text x="${mx}" y="${my + 3.5}" text-anchor="middle">${i + 1}</text></g>`;
+    const ecls = hi ? (hi.has(e.from) && hi.has(e.to) ? "edge on" : "edge dim") : "edge";
+    return `<g class="${ecls}"><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" marker-end="url(#ah)"/><circle cx="${mx}" cy="${my}" r="9"/><text x="${mx}" y="${my + 3.5}" text-anchor="middle">${i + 1}</text></g>`;
   }).join("");
-  const nodes = a.nodes.map(n => {
-    const x = PAD + n.col * COLW, y = PAD + n.row * ROWH, st = ans[n.id];
-    const hidden = UI.archMode === "quiz" && n.cat !== "fixed" && !st;
-    const cls = ["node", hidden ? "hidden" : "", st === "ok" ? "ok" : st === "miss" ? "miss" : "", UI.archSel === n.id ? "sel" : ""].join(" ");
-    const lines = hidden ? ["?"] : wrapLabel(n.label, 22);
+  const ns = nodes.map(n => {
+    const x = PAD + n.col * COLW, y = PAD + n.row * ROWH;
+    const hidden = o.hidden ? o.hidden(n) : false;
+    const cls = ["node", hidden ? "hidden" : "", o.cls ? o.cls(n) : "", hi ? (hi.has(n.id) ? "on" : "dim") : ""].join(" ");
+    const lab = o.label ? o.label(n) : n.label;
+    const lines = hidden ? ["?"] : wrapLabel(lab, 22);
     const ty = y + NH / 2 + 4 - (lines.length - 1) * 7.5 + (hidden ? 4 : 5);
     const text = lines.map((l, i) => `<tspan x="${x + NW / 2 + 3}" dy="${i ? 15 : 0}">${esc(l)}</tspan>`).join("");
-    return `<g class="${cls}" data-node="${n.id}" tabindex="0" role="button" aria-label="${hidden ? "Hidden " + CAT_LABEL[n.cat] + " component" : esc(n.label)}">
+    return `<g class="${cls}" data-node="${n.id}" tabindex="0" role="button" aria-label="${hidden ? "Hidden " + CAT_LABEL[n.cat] + " component" : esc(lab)}">
       <rect class="box" x="${x}" y="${y}" width="${NW}" height="${NH}" rx="5" style="stroke:var(--c-${n.cat})"/>
       <rect class="stripe" x="${x}" y="${y}" width="6" height="${NH}" rx="2" style="fill:var(--c-${n.cat})"/>
       <text class="cat" x="${x + 12}" y="${y + 12}">${CAT_LABEL[n.cat].toUpperCase()}</text>
       <text class="lab" text-anchor="middle" y="${ty}">${text}</text></g>`;
   }).join("");
-  return `<svg viewBox="0 0 ${W} ${H}" style="min-width:${Math.round(W * 0.78)}px" role="img" aria-label="${esc(a.title)} architecture diagram">
+  return `<svg viewBox="0 0 ${W} ${H}" style="min-width:${Math.round(W * 0.78)}px" role="img" aria-label="${esc(o.title || "")} architecture diagram">
     <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--ink-2)"/></marker></defs>
-    ${edges}${nodes}</svg>`;
+    ${es}${ns}</svg>`;
+}
+function archSVG(a) {
+  const ans = UI.archAns;
+  return drawDiagram(a.nodes, a.edges, { title: a.title,
+    hidden: n => UI.archMode === "quiz" && n.cat !== "fixed" && !ans[n.id],
+    cls: n => [ans[n.id] === "ok" ? "ok" : ans[n.id] === "miss" ? "miss" : "", UI.archSel === n.id ? "sel" : ""].join(" ") });
 }
 function norm(s) { return s.toLowerCase().replace(/\(.*?\)/g, "").replace(/[^a-z0-9]+/g, " ").trim(); }
 const POOL = (() => { const m = {}; DATA.architectures.forEach(a => a.nodes.forEach(n => { if (n.cat === "fixed") return; (m[n.cat] = m[n.cat] || new Map()).set(norm(n.label), n.label); })); return m; })();
@@ -621,6 +680,7 @@ function viewProgress() {
   const sAns = Object.values(P.scen), sRight = sAns.filter(s => s.last).length;
   const archDone = Object.keys(P.arch).length;
   const learned = Object.values(P.srs).filter(s => s.box >= 3).length;
+  const labVals = Object.values(P.labs).map(x => x.best), revVals = Object.values(P.reviews).map(x => x.best);
   const rows = DATA.domains.map(d => {
     const cs = all.filter(c => c.domain === d.id);
     const cell = tier => { const t = tier ? cs.filter(c => c.tier === tier) : cs; if (!t.length) return `<td class="muted">–</td>`; const p = pct(t.filter(c => rating(c.id) >= 2).length, t.length); return `<td><span class="heat" style="${heatStyle(p)}">${p}%</span></td>`; };
@@ -635,6 +695,8 @@ function viewProgress() {
       <div class="panel tile"><div class="eyebrow">Cards learned</div><div class="big">${learned}</div></div>
       <div class="panel tile"><div class="eyebrow">Scenario accuracy</div><div class="big">${sAns.length ? pct(sRight, sAns.length) + "%" : "–"}</div><div class="muted" style="font-size:.85rem">${sAns.length} answered</div></div>
       <div class="panel tile"><div class="eyebrow">Diagrams completed</div><div class="big">${archDone}<span class="muted" style="font-size:1rem"> / ${DATA.architectures.length}</span></div></div>
+      <div class="panel tile"><div class="eyebrow">Design labs (avg best)</div><div class="big">${labVals.length ? Math.round(labVals.reduce((x, y) => x + y, 0) / labVals.length) + "%" : "–"}</div><div class="muted" style="font-size:.85rem">${labVals.length} / ${DATA.labs.length} labs done</div></div>
+      <div class="panel tile"><div class="eyebrow">Design reviews (avg best)</div><div class="big">${revVals.length ? Math.round(revVals.reduce((x, y) => x + y, 0) / revVals.length) + "%" : "–"}</div><div class="muted" style="font-size:.85rem">${revVals.length} / ${DATA.reviews.length} reviews done · ${Object.keys(P.journeys).length} journeys</div></div>
     </div>
     <div class="panel" style="padding:8px 8px 4px;margin-bottom:18px"><div class="table-wrap"><table>
       <thead><tr><th>Domain</th><th>Core</th><th>Working</th><th>Aware</th><th>All</th><th>Unrated</th></tr></thead><tbody>${rows}</tbody></table></div>
@@ -646,6 +708,210 @@ function viewProgress() {
       ? `<span class="confirm"><span>This erases all ratings, cards and scores.</span><button class="btn small" id="doreset" style="border-color:var(--bad);color:var(--bad)">Erase progress</button><button class="btn small" id="noreset">Keep it</button></span>`
       : `<button class="btn small" id="askreset">Reset all progress</button>`}</div>`;
 }
+
+/* ---------- Architect: guide, journeys, design lab, reviews ---------- */
+const AX = { view: "home", id: null, step: 0, picks: {}, showRef: false, checks: {}, submitted: false, order: null };
+function inlineMd(s) {
+  let h = md(s);
+  h = h.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m, t, u) => {
+    const url = u.replace(/&amp;/g, "&");
+    if (/^https?:\/\//.test(url)) return `<a href="${esc(url)}" target="_blank" rel="noopener">${t}</a>`;
+    if (url.includes("#architect")) return `<button class="linkish" data-ax="home">${t}</button>`;
+    return `<span class="xref">${t}</span>`;
+  });
+  return h.replace(/&lt;(\/?)(details|summary)&gt;/g, "<$1$2>");
+}
+function mdDoc(src) {
+  const lines = src.split("\n"), out = [];
+  let i = 0;
+  const isTable = l => /^\s*\|/.test(l);
+  while (i < lines.length) {
+    const l = lines[i];
+    if (/^```/.test(l)) { const buf = []; i++; while (i < lines.length && !/^```/.test(lines[i])) buf.push(lines[i++]); i++; out.push(`<pre><code>${esc(buf.join("\n"))}</code></pre>`); continue; }
+    const hm = l.match(/^(#{1,4})\s+(.*)$/);
+    if (hm) { const lv = Math.min(4, hm[1].length + 1); out.push(`<h${lv}>${inlineMd(hm[2])}</h${lv}>`); i++; continue; }
+    if (/^---+\s*$/.test(l)) { out.push("<hr>"); i++; continue; }
+    if (isTable(l)) {
+      const rows = []; while (i < lines.length && isTable(lines[i])) rows.push(lines[i++]);
+      const cells = r => r.trim().replace(/^\||\|$/g, "").split("|").map(c => c.trim());
+      const body = rows.filter((r, k) => !(k === 1 && /^[\s|:-]+$/.test(r)));
+      out.push(`<div class="table-wrap"><table><thead><tr>${cells(body[0]).map(c => `<th>${inlineMd(c)}</th>`).join("")}</tr></thead><tbody>${body.slice(1).map(r => `<tr>${cells(r).map(c => `<td>${inlineMd(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`);
+      continue;
+    }
+    if (/^>\s?/.test(l)) { const buf = []; while (i < lines.length && /^>\s?/.test(lines[i])) buf.push(lines[i++].replace(/^>\s?/, "")); out.push(`<blockquote>${inlineMd(buf.join(" "))}</blockquote>`); continue; }
+    if (/^(\s*[-*]|\s*\d+\.)\s+/.test(l)) {
+      const ordered = /^\s*\d+\./.test(l), items = [];
+      while (i < lines.length && /^(\s*[-*]|\s*\d+\.)\s+/.test(lines[i])) {
+        let it = lines[i++].replace(/^(\s*[-*]|\s*\d+\.)\s+/, "");
+        while (i < lines.length && /^\s{2,}\S/.test(lines[i]) && !/^(\s*[-*]|\s*\d+\.)\s+/.test(lines[i])) it += " " + lines[i++].trim();
+        items.push(`<li>${inlineMd(it)}</li>`);
+      }
+      out.push(ordered ? `<ol>${items.join("")}</ol>` : `<ul>${items.join("")}</ul>`); continue;
+    }
+    if (!l.trim()) { i++; continue; }
+    const buf = [l]; i++;
+    while (i < lines.length && lines[i].trim() && !/^(#|```|>|\s*\||---|\s*[-*]\s|\s*\d+\.\s)/.test(lines[i])) buf.push(lines[i++]);
+    out.push(`<p>${inlineMd(buf.join(" "))}</p>`);
+  }
+  return out.join("\n");
+}
+const GRADE = { best: { t: "Strong", s: 2 }, ok: { t: "Acceptable", s: 1 }, poor: { t: "Weak", s: 0 } };
+function axHome() {
+  const labsDone = DATA.labs.filter(l => P.labs[l.id]).length, revDone = DATA.reviews.filter(r => P.reviews[r.id]).length;
+  const jDone = DATA.journeys.filter(j => P.journeys[j.id]).length;
+  const card = (ax, eyebrow, title, body, meta) => `<button class="ax-card" data-ax="${ax}"><span class="eyebrow">${eyebrow}</span><strong class="ac-title">${title}</strong><p>${body}</p><span class="muted" style="font-size:.85rem">${meta}</span></button>`;
+  return `<div class="eyebrow">Architect</div><h2>Put the pieces together</h2>
+    <p class="lede">Knowing services one at a time isn't the hard part. Combining them is. Work through these in order: read how architects think, watch the pieces interact in real flows, then make the decisions yourself and review other people's designs.</p>
+    <div class="ax-grid">
+      ${card("guide", "1 · Read", "How to architect", "The design loop, the questions that drive a design, the knock-on map (“if you choose X, you must handle Y”), failure walks, what a bank's review board asks, plus worked designs and Google's case studies.", `${DATA.guides.length} readings`)}
+      ${card("journeys", "2 · Watch", "End-to-end journeys", "Follow one request, identity, dataset, deployment, failure or agent task through a whole architecture, one highlighted hop at a time.", `${jDone} / ${DATA.journeys.length} completed`)}
+      ${card("labs", "3 · Decide", "Design lab", "Build a solution decision by decision. Every choice gets feedback on why it's strong, acceptable or weak for this brief, and twists change the requirements halfway.", `${labsDone} / ${DATA.labs.length} completed`)}
+      ${card("reviews", "4 · Critique", "Design reviews", "Sit on the review board: find the real problems in a proposal without flagging the choices that are fine.", `${revDone} / ${DATA.reviews.length} completed`)}
+    </div>`;
+}
+function axGuide() {
+  const g = DATA.guides.find(x => x.id === AX.id) || DATA.guides[0];
+  return `<div class="row" style="margin-bottom:12px"><button class="btn small" data-ax="home">Architect home</button>
+      ${DATA.guides.map(x => `<button class="chip" data-ax="guide" data-arg="${x.id}" aria-pressed="${x.id === g.id}">${esc(x.title.replace(/:.*$/, ""))}</button>`).join("")}</div>
+    <article class="panel prose">${mdDoc(g.md)}</article>`;
+}
+function axJourneyList() {
+  return `<div class="row" style="margin-bottom:12px"><button class="btn small" data-ax="home">Architect home</button></div>
+    <h2>End-to-end journeys</h2><p class="lede">Each journey follows one thing across a whole architecture. Before each step, guess what happens at the highlighted components, then read.</p>
+    <div class="arch-list">${DATA.journeys.map(j => { const a = DATA.architectures.find(x => x.id === j.arch); return `<button class="arch-card" data-ax="journey" data-arg="${j.id}">
+      <span class="lvl" style="color:var(--accent)">${j.steps.length} steps${P.journeys[j.id] ? " · done" : ""}</span><strong class="ac-title">${esc(j.title)}</strong><p>${esc(j.lesson)}</p><span class="muted" style="font-size:.85rem">On: ${esc(a.title)}</span></button>`; }).join("")}</div>`;
+}
+function axJourney() {
+  const j = DATA.journeys.find(x => x.id === AX.id), a = DATA.architectures.find(x => x.id === j.arch);
+  const st = j.steps[AX.step], hi = new Set(st.nodes), last = AX.step === j.steps.length - 1;
+  return `<div class="row" style="margin-bottom:12px"><button class="btn small" data-ax="journeys">All journeys</button></div>
+    <h2>${esc(j.title)}</h2><p class="lede" style="margin-bottom:10px">${esc(j.lesson)}</p>
+    <figure style="margin:0"><div class="canvas">${drawDiagram(a.nodes, a.edges, { title: a.title, hi })}</div></figure>
+    <div class="panel jstep">
+      <div class="row"><span class="eyebrow">Step ${AX.step + 1} of ${j.steps.length}</span>
+        <span class="dots">${j.steps.map((_, k) => `<button class="dot ${k === AX.step ? "cur" : k < AX.step ? "past" : ""}" data-ax="jgo" data-arg="${k}" aria-label="Step ${k + 1}"></button>`).join("")}</span></div>
+      <p class="jtext">${md(st.text)}</p>
+      <div class="row"><button class="btn" data-ax="jgo" data-arg="${AX.step - 1}" ${AX.step ? "" : "disabled"}>Previous</button>
+        ${last ? `<button class="btn primary" data-ax="jdone">Finish journey</button>` : `<button class="btn primary" data-ax="jgo" data-arg="${AX.step + 1}">Next step</button>`}
+        <span class="muted" style="font-size:.85rem">Arrow keys also work</span></div>
+    </div>`;
+}
+function labScore(l) { let s = 0; l.steps.forEach((st, k) => { const p = AX.picks[k]; if (p !== undefined) s += GRADE[st.options[p].grade].s; }); return s; }
+function axLabList() {
+  return `<div class="row" style="margin-bottom:12px"><button class="btn small" data-ax="home">Architect home</button></div>
+    <h2>Design lab</h2><p class="lede">Read the brief and requirements, then make each decision before looking at the feedback. The diagram fills in as you choose. Twists change the requirements, as real projects do.</p>
+    <div class="arch-list">${DATA.labs.map(l => { const s = P.labs[l.id]; return `<button class="arch-card" data-ax="lab" data-arg="${l.id}">
+      <span class="lvl" style="color:var(--accent)">${l.steps.length} decisions${s ? ` · best ${s.best}%` : ""}</span><strong class="ac-title">${esc(l.title)}</strong><p>${esc(l.brief)}</p></button>`; }).join("")}</div>`;
+}
+function axLab() {
+  const l = DATA.labs.find(x => x.id === AX.id);
+  const done = Object.keys(AX.picks).length === l.steps.length && AX.step >= l.steps.length;
+  const slotLabel = n => {
+    if (n.cat === "fixed" || n.label !== "?") return n.label;
+    let lab = null;
+    l.steps.forEach((st, k) => { if (st.slot === n.id) { if (AX.showRef) { if (!lab || st.kind === "step") lab = (st.options.find(o => o.grade === "best") || {}).label; } else if (AX.picks[k] !== undefined) lab = st.options[AX.picks[k]].label; } });
+    return lab;
+  };
+  const cur = !done && l.steps[AX.step];
+  const diag = drawDiagram(l.slots, l.edges, { title: l.title,
+    hidden: n => !slotLabel(n), label: n => slotLabel(n) || "?",
+    cls: n => [!slotLabel(n) ? "slot" : "", cur && cur.slot === n.id ? "sel" : ""].join(" ") });
+  let panel;
+  if (!done) {
+    const st = l.steps[AX.step], picked = AX.picks[AX.step];
+    panel = `<div class="panel quiz ${st.kind === "twist" ? "twist" : ""}">
+      <div class="row"><span class="eyebrow">${st.kind === "twist" ? "Requirement change" : "Decision"} ${AX.step + 1} of ${l.steps.length}</span><span class="muted" style="margin-left:auto;font-size:.85rem">Score so far ${labScore(l)} / ${2 * Object.keys(AX.picks).length}</span></div>
+      <h3>${esc(st.title)}</h3><p style="margin:0">${md(st.question)}</p>
+      <div class="opts lab-opts">${AX.optOrder[AX.step].map(k => { const o = st.options[k];
+        if (picked === undefined) return `<button class="opt" data-ax="pick" data-arg="${k}">${esc(o.label)}</button>`;
+        const g = GRADE[o.grade];
+        return `<div class="fb ${o.grade} ${k === picked ? "mine" : ""}"><div class="row"><strong>${esc(o.label)}</strong><span class="gchip ${o.grade}">${g.t}</span>${k === picked ? `<span class="tier" style="color:var(--ink)">your choice</span>` : ""}</div><p>${md(o.feedback)}</p></div>`;
+      }).join("")}</div>
+      ${picked !== undefined ? `<div><button class="btn primary" data-ax="lnext">${AX.step + 1 < l.steps.length ? "Next decision" : "See the summary"}</button></div>` : ""}
+    </div>`;
+  } else {
+    const sc = labScore(l), max = 2 * l.steps.length, p = pct(sc, max);
+    panel = `<div class="panel quiz"><div class="eyebrow">Summary</div><h3>${sc} / ${max} (${p}%)</h3>
+      <p class="muted" style="margin:0">${p >= 85 ? "Strong design reasoning. Try the twists in your head with different numbers." : p >= 60 ? "A solid base. Read the feedback on the decisions marked acceptable or weak, then replay." : "Read the feedback below and the related atlas concepts, then replay this lab."}</p>
+      <div class="table-wrap"><table><thead><tr><th>Decision</th><th>Your choice</th><th>Rating</th><th>Strongest option</th></tr></thead><tbody>
+      ${l.steps.map((st, k) => { const o = st.options[AX.picks[k]], b = st.options.find(x => x.grade === "best"); return `<tr><td>${st.kind === "twist" ? "Twist: " : ""}${esc(st.title)}</td><td>${esc(o.label)}</td><td><span class="gchip ${o.grade}">${GRADE[o.grade].t}</span></td><td>${o.grade === "best" ? "–" : esc(b.label)}</td></tr>`; }).join("")}
+      </tbody></table></div>
+      <div class="row"><button class="btn" data-ax="lref">${AX.showRef ? "Show my design" : "Show the reference design"}</button><button class="btn" data-ax="lab" data-arg="${l.id}">Replay this lab</button><button class="btn primary" data-ax="labs">More labs</button></div></div>`;
+  }
+  return `<div class="row" style="margin-bottom:12px"><button class="btn small" data-ax="labs">All labs</button></div>
+    <h2>${esc(l.title)}</h2>
+    <div class="brief"><p style="margin:0">${md(l.brief)}</p><ul>${l.requirements.map(r => `<li>${md(r)}</li>`).join("")}</ul></div>
+    <figure style="margin:0"><div class="canvas">${diag}</div><figcaption class="muted" style="font-size:.85rem;margin-top:6px">${done && AX.showRef ? "Reference design: the strongest option for each decision." : "Dashed boxes are decisions you haven't made yet. The highlighted box is the current decision."}</figcaption></figure>
+    ${panel}`;
+}
+function axReviewList() {
+  return `<div class="row" style="margin-bottom:12px"><button class="btn small" data-ax="home">Architect home</button></div>
+    <h2>Design reviews</h2><p class="lede">You're on the architecture review board. Each proposal mixes real problems with choices that are fine. Flag only the real ones, which is harder than it sounds.</p>
+    <div class="arch-list">${DATA.reviews.map(r => { const s = P.reviews[r.id]; return `<button class="arch-card" data-ax="review" data-arg="${r.id}">
+      <span class="lvl" style="color:var(--c-security)">${r.issues.length} statements${s ? ` · best ${s.best}%` : ""}</span><strong class="ac-title">${esc(r.title)}</strong><p>${esc(r.design)}</p></button>`; }).join("")}</div>`;
+}
+function axReview() {
+  const r = DATA.reviews.find(x => x.id === AX.id);
+  if (!AX.order) AX.order = shuffle(r.issues.map((_, k) => k));
+  const items = AX.order.map(k => {
+    const it = r.issues[k], on = !!AX.checks[k];
+    if (!AX.submitted) return `<label class="chk"><input type="checkbox" data-ax="chk" data-arg="${k}" ${on ? "checked" : ""}><span>${md(it.text)}</span></label>`;
+    const ok = on === it.real;
+    const verdict = it.real ? (on ? "Correctly flagged" : "Missed issue") : (on ? "False alarm: this is fine" : "Correctly left alone");
+    return `<div class="fb ${ok ? "best" : "poor"}"><div class="row"><span class="gchip ${ok ? "best" : "poor"}">${verdict}</span></div><p><strong>${md(it.text)}</strong></p><p>${md(it.explain)}</p></div>`;
+  }).join("");
+  const right = r.issues.filter((it, k) => !!AX.checks[k] === it.real).length;
+  return `<div class="row" style="margin-bottom:12px"><button class="btn small" data-ax="reviews">All reviews</button></div>
+    <h2>${esc(r.title)}</h2><div class="brief"><span class="eyebrow">The proposal</span><p style="margin:6px 0 0">${md(r.design)}</p></div>
+    <figure style="margin:0"><div class="canvas">${drawDiagram(r.nodes, r.edges, { title: r.title })}</div></figure>
+    <ol class="panel flows">${r.edges.map((e, i) => `<li><b>${i + 1}</b><span>${esc(r.nodes.find(n => n.id === e.from).label)} → ${esc(r.nodes.find(n => n.id === e.to).label)} <span class="via">· ${esc(e.label)}</span></span></li>`).join("")}</ol>
+    <div class="panel quiz"><div class="eyebrow">${AX.submitted ? `Result: ${right} of ${r.issues.length} judged correctly` : "Tick every statement that is a real problem you'd raise in review"}</div>
+      <div class="review-items">${items}</div>
+      <div class="row">${AX.submitted ? `<button class="btn" data-ax="review" data-arg="${r.id}">Try again</button><button class="btn primary" data-ax="reviews">More reviews</button>` : `<button class="btn primary" data-ax="rsubmit">Submit review</button>`}</div></div>`;
+}
+function viewArchitect() {
+  if (AX.view === "guide") return axGuide();
+  if (AX.view === "journeys") return axJourneyList();
+  if (AX.view === "journey") return axJourney();
+  if (AX.view === "labs") return axLabList();
+  if (AX.view === "lab") return axLab();
+  if (AX.view === "reviews") return axReviewList();
+  if (AX.view === "review") return axReview();
+  return axHome();
+}
+function axAction(act, arg) {
+  if (act === "home" || act === "journeys" || act === "labs" || act === "reviews") { AX.view = act; }
+  else if (act === "guide") { AX.view = "guide"; AX.id = arg || (DATA.guides[0] && DATA.guides[0].id); }
+  else if (act === "journey") { AX.view = "journey"; AX.id = arg; AX.step = 0; }
+  else if (act === "jgo") { const j = DATA.journeys.find(x => x.id === AX.id); AX.step = Math.max(0, Math.min(j.steps.length - 1, +arg)); render(); return; }
+  else if (act === "jdone") { P.journeys[AX.id] = true; touch(); AX.view = "journeys"; }
+  else if (act === "lab") { AX.view = "lab"; AX.id = arg; AX.step = 0; AX.picks = {}; AX.showRef = false; AX.optOrder = DATA.labs.find(x => x.id === arg).steps.map(st => shuffle(st.options.map((_, k) => k))); }
+  else if (act === "pick") { AX.picks[AX.step] = +arg; render(); return; }
+  else if (act === "lnext") {
+    AX.step++;
+    const l = DATA.labs.find(x => x.id === AX.id);
+    if (AX.step >= l.steps.length) { const p = pct(labScore(l), 2 * l.steps.length); const prev = P.labs[l.id] || { best: 0, attempts: 0 }; P.labs[l.id] = { best: Math.max(prev.best, p), attempts: prev.attempts + 1 }; touch(); }
+    render(); return;
+  }
+  else if (act === "lref") { AX.showRef = !AX.showRef; render(); return; }
+  else if (act === "review") { AX.view = "review"; AX.id = arg; AX.checks = {}; AX.submitted = false; AX.order = null; }
+  else if (act === "rsubmit") {
+    const r = DATA.reviews.find(x => x.id === AX.id); AX.submitted = true;
+    const p = pct(r.issues.filter((it, k) => !!AX.checks[k] === it.real).length, r.issues.length);
+    const prev = P.reviews[r.id] || { best: 0, attempts: 0 }; P.reviews[r.id] = { best: Math.max(prev.best, p), attempts: prev.attempts + 1 }; touch();
+    render(); return;
+  }
+  render(); window.scrollTo(0, 0);
+}
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-ax]"); if (!t || t.tagName === "INPUT") return;
+  axAction(t.dataset.ax, t.dataset.arg);
+});
+document.addEventListener("change", e => { if (e.target.dataset && e.target.dataset.ax === "chk") AX.checks[e.target.dataset.arg] = e.target.checked; });
+document.addEventListener("keydown", e => {
+  if (UI.tab !== "architect" || AX.view !== "journey" || e.target.closest("input, select, textarea")) return;
+  if (e.key === "ArrowRight") axAction("jgo", AX.step + 1); else if (e.key === "ArrowLeft") axAction("jgo", AX.step - 1);
+});
 
 /* ---------- events ---------- */
 function jump(id) {
@@ -670,7 +936,7 @@ document.addEventListener("click", e => {
   else if (d.arch) { UI.arch = d.arch; UI.archAns = {}; UI.archSel = null; UI.optCache = {}; UI.lastPick = null; render(); window.scrollTo(0, 0); }
   else if (t.id === "backarch") { UI.arch = null; render(); }
   else if (d.amode) { UI.archMode = d.amode; render(); }
-  else if (d.node) { UI.archSel = d.node; render(); const q = $(".quiz"); if (q && window.innerWidth < 860) q.scrollIntoView({ block: "nearest" }); }
+  else if (d.node && UI.tab === "diagrams") { UI.archSel = d.node; render(); const q = $(".quiz"); if (q && window.innerWidth < 860) q.scrollIntoView({ block: "nearest" }); }
   else if (d.pick !== undefined) {
     const a = DATA.architectures.find(x => x.id === UI.arch), n = a.nodes.find(x => x.id === UI.archSel);
     UI.archAns[n.id] = d.pick === n.label ? "ok" : "miss"; UI.lastPick = d.pick; recordArch(a); render();
@@ -711,7 +977,7 @@ document.addEventListener("change", e => {
 });
 
 const start = (location.hash || "").slice(1);
-go(["atlas", "cards", "diagrams", "scenarios", "progress"].includes(start) ? start : "atlas");
+go(["architect", "atlas", "cards", "diagrams", "scenarios", "progress"].includes(start) ? start : "architect");
 if (P.updated) setSync("progress: this browser");
 connect();
 </script>
