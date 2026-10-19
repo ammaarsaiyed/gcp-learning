@@ -245,6 +245,61 @@ def read_guides():
     return out
 
 
+def parse_path(concepts, qs, archs, journeys, labs, reviews, guides):
+    text = open(os.path.join(ROOT, "path", "learning-path.md"), encoding="utf-8").read()
+    terms = [(c["term"].lower(), c["id"]) for c in concepts]
+
+    def concept_ref(ref, where):
+        r = ref.strip().lower()
+        exact = [cid for t, cid in terms if t == r]
+        if exact:
+            return exact[0]
+        pre = [cid for t, cid in terms if t.startswith(r)]
+        if len(pre) != 1:
+            sys.exit(f"{where}: concept ref {ref!r} matches {len(pre)} concepts")
+        return pre[0]
+
+    kinds = {"diagram": {a["id"] for a in archs}, "journey": {j["id"] for j in journeys},
+             "lab": {l["id"] for l in labs}, "review": {r["id"] for r in reviews}, "read": {g["id"] for g in guides}}
+    stages, seen = [], {}
+    for sblock in re.split(r"^## Stage: ", text, flags=re.M)[1:]:
+        stitle, srest = sblock.split("\n", 1)
+        stage = {"id": _field(srest, "id"), "title": stitle.strip(), "summary": _field(srest, "summary"), "lessons": []}
+        for lblock in re.split(r"^### Lesson: ", srest, flags=re.M)[1:]:
+            ltitle, lrest = lblock.split("\n", 1)
+            where = f"lesson '{ltitle.strip()}'"
+            cids = [concept_ref(x, where) for x in _field(lrest, "concepts").split(";") if x.strip()]
+            for cid in cids:
+                if cid in seen:
+                    print(f"  note: {cid} appears in {seen[cid]} and {where}")
+                seen[cid] = where
+            practice = []
+            for item in [x.strip() for x in _field(lrest, "practice").split(";") if x.strip()]:
+                kind, ref = item.split(":", 1)
+                if kind == "quiz":
+                    hits = [q["id"] for q in qs if q["q"].lower().startswith(ref.strip().lower())]
+                    if len(hits) != 1:
+                        sys.exit(f"{where}: quiz ref {ref!r} matches {len(hits)} questions")
+                    practice.append({"kind": "quiz", "ref": hits[0]})
+                elif kind in kinds:
+                    if ref.strip() not in kinds[kind]:
+                        sys.exit(f"{where}: unknown {kind} {ref!r}")
+                    practice.append({"kind": kind, "ref": ref.strip()})
+                else:
+                    sys.exit(f"{where}: unknown practice kind {kind!r}")
+            stage["lessons"].append({"id": _field(lrest, "id"), "title": ltitle.strip(), "minutes": int(_field(lrest, "minutes") or 30),
+                                     "goal": _field(lrest, "goal"), "concepts": cids, "practice": practice,
+                                     "checkpoint": _field(lrest, "checkpoint")})
+        stages.append(stage)
+    missing_core = [c["term"] for c in concepts if c["tier"] == "core" and c["id"] not in seen]
+    missing_working = [c["term"] for c in concepts if c["tier"] == "working" and c["id"] not in seen]
+    if missing_core:
+        sys.exit(f"path is missing core concepts: {missing_core}")
+    if missing_working:
+        print(f"  path skips {len(missing_working)} working concepts: {missing_working}")
+    return stages
+
+
 def strip_md(s):
     s = re.sub(r"\*\*(.+?)\*\*", r"\1", s)
     return re.sub(r"`(.+?)`", r"\1", s)
@@ -296,8 +351,9 @@ def main():
     archs = parse_architectures()
     qs = parse_scenarios()
     journeys, labs, reviews, guides = parse_journeys(archs), parse_labs(), parse_reviews(), read_guides()
+    path = parse_path(concepts, qs, archs, journeys, labs, reviews, guides)
     data = {"domains": domains, "concepts": concepts, "architectures": archs, "scenarios": qs,
-            "journeys": journeys, "labs": labs, "reviews": reviews, "guides": guides}
+            "journeys": journeys, "labs": labs, "reviews": reviews, "guides": guides, "path": path}
     tpl = open(os.path.join(ROOT, "app", "template.html"), encoding="utf-8").read()
     payload = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
     html = tpl.replace("/*__DATA__*/null", payload)
@@ -306,7 +362,9 @@ def main():
     tiers = {t: sum(c["tier"] == t for c in concepts) for t in ("core", "working", "aware")}
     print(f"{len(domains)} domains, {len(concepts)} concepts {tiers}, {len(archs)} architectures, "
           f"{len(qs)} scenarios, {n_cards} flashcards, {len(journeys)} journeys, {len(labs)} labs "
-          f"({sum(len(l['steps']) for l in labs)} decisions), {len(reviews)} reviews, {len(guides)} guides")
+          f"({sum(len(l['steps']) for l in labs)} decisions), {len(reviews)} reviews, {len(guides)} guides, "
+          f"path: {sum(len(st['lessons']) for st in path)} lessons in {len(path)} stages, "
+          f"{sum(l['minutes'] for st in path for l in st['lessons']) / 60:.1f} h")
 
 
 if __name__ == "__main__":

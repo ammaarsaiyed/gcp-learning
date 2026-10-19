@@ -1,84 +1,116 @@
-# GCP in 5 Days, with depth
+# Learn Google Cloud, in order
 
-A focused but complete way to learn Google Cloud for someone who learns on the job, is an **AI engineer in a UK bank**, and has bounced off the 72-hour learning paths.
+A complete, sequenced way to learn Google Cloud for someone who learns on the job, is an **AI engineer in a UK bank**, and has bounced off the 72-hour learning paths. It goes from zero to designing and defending bank-grade cloud and AI systems.
 
-**Goal:** by Friday you can (1) explain the building blocks and the networking, security and distributed-systems ideas underneath them, (2) look at any architecture and name every part and why it's there, and (3) design solutions and defend the trade-offs in a bank's architecture review.
+## Start here
 
-## What's in here
+**Open the practice app and press "Start lesson 1".** That's the whole instruction.
 
-| Part | What it is | Use it for |
+The app's **Learn** tab runs the [learning path](path/learning-path.md): **43 lessons in 11 stages**, 20–60 minutes each, about 28 hours in total. Each lesson:
+
+1. **Frames the problem:** why these concepts matter, and how they connect to what you learned before.
+2. **Teaches the concepts one at a time:** you explain each one to yourself, *then* reveal it and rate yourself. Each concept you study joins your flashcard deck automatically.
+3. **Makes you use them immediately:** scenario questions, naming the parts of a real architecture, stepping through an end-to-end journey, making decisions in a design lab, or finding the flaws in someone else's design.
+4. **Ends with a checkpoint:** one question that ties it together, answered out loud.
+
+The path runs in dependency order, so each stage builds on the last:
+
+```
+ 1 Foundations         how GCP is organised: projects, locations, billing, responsibility
+ 2 Networks            addresses, routes, ports, TCP, DNS, HTTP, TLS, proxies, firewalls
+ 3 Identity & security tokens, IAM, service accounts, zero trust, keys, perimeters, guardrails
+ 4 GCP networking      VPCs, private access, Shared VPC, hybrid links, load balancers, edge
+ 5 Compute             VMs, containers, Kubernetes/GKE, Cloud Run
+ 6 Data                storage, database theory, GCP databases, BigQuery, pipelines
+ 7 Services talking    APIs, streaming, messaging, idempotency, retries, sagas
+ 8 Running it          SLOs, DR, observability, CI/CD, IaC, governance, cost, migration
+ 9 AI                  ML lifecycle, LLMs, RAG, agents, MCP/A2A, AI safety and governance
+10 Banking context     PRA/FCA, operational resilience, outsourcing, UK GDPR, model risk
+11 Architect           the design loop, worked designs, Google's case studies, ongoing practice
+```
+
+Every core and working concept in the atlas is covered somewhere on the path. The build checks this.
+
+### Every day you study
+
+1. **Flashcards first (10 min).** The Learn page shows how many are due. They come from the concepts you've studied.
+2. **Then the next lesson(s).** Press *Continue*. The app remembers where you are, and saves progress to your account, so it works on laptop and phone.
+3. **If a checkpoint stumps you,** step back to the concept you're missing (the bar at the top of each lesson). That gap is what to fix.
+
+### Suggested schedule (about 3 hours a day)
+
+| Day | Lessons | What you cover |
 |---|---|---|
-| [**How to architect**](guide/01-how-to-architect.md) · [**Journeys**](guide/02-end-to-end-journeys.md) · [**Worked designs and case studies**](guide/03-worked-designs-and-case-studies.md) · [**Practice resources**](guide/04-practice-resources.md) | Reading on **putting the pieces together**: the design loop, the "if you choose X you must handle Y" knock-on map, failure walks, the questions a bank review board asks, 9 end-to-end journeys (request, identity, data, deployment, failure, agent, network, latency, egress), a full worked AI-underwriting design, Google's 4 official architect case studies analysed, and curated online practice | **Integration, the most important part.** Read 01 first |
-| **Architect section of the app** | Journeys you step through on highlighted diagrams, a **design lab** (7 briefs, 58 decisions with graded feedback and requirement twists, plus your design and a reference design built as you go), and **design reviews** (8 flawed proposals: find the real problems, ignore the red herrings) | Practising architecture interactively |
-| [**Concept atlas**](atlas/README.md) | 401 concepts in 13 domains, from TCP handshakes to PRA SS1/23. Each has *What*, *How it works*, *On GCP* and *Watch out*, at three tiers (core / working / aware). | **Depth and completeness.** This is the map of what matters. |
-| [**Practice app**](app/index.html) | An interactive page: rate yourself on every concept, spaced-repetition flashcards, **18 architecture diagrams with hidden labels** to name, 63 scenario questions, and a progress view showing your gaps. | **Active recall.** It replaces re-reading and re-watching. |
-| [**Architecture library**](practice/architectures.md) | The same 18 designs as text: each component, and why it was chosen. Most are bank or AI scenarios (RAG assistant, fraud scoring, agentic servicing with MCP/A2A, Open Banking, VPC-SC data science, hybrid landing zone…). | Learning to *see* solutions. |
-| [`flashcards.csv`](flashcards.csv) | Every atlas concept plus the original 95 cards, ready to import into Anki. | Spaced repetition on your phone. |
-| [One-pager](00-gcp-on-one-page.md) and [cheat sheets](cheatsheets/) | The skeleton (the 8 lenses), the service map, decision trees, the design template, `gcloud` grammar. | Morning review, and reference while designing. |
-| [Hands-on labs](day-1-foundations.md) (`day-*.md`) | Optional. A Cloud Run app that grows through the week. | Later, when you have time to build. |
+| 1 | 1–5 | How GCP is organised, and networking fundamentals |
+| 2 | 6–9 | Authentication, tokens, IAM, identities for software, zero trust |
+| 3 | 10–13 | Keys, secrets, guardrails, perimeters, VPCs, private connectivity |
+| 4 | 14–17 | Hybrid connectivity, load balancers and edge, VMs, containers |
+| 5 | 18–21 | GKE, Cloud Run, storage, database theory |
+| 6 | 22–25 | GCP databases, analytics, data pipelines, APIs |
+| 7 | 26–29 | Streaming and API management, messaging, failure patterns, reliability and DR |
+| 8 | 30–33 | Observability, delivery, governance and cost, migration |
+| 9 | 34–37 | ML, LLMs, RAG, agents |
+| 10 | 38–40 | Safe AI, banking regulation |
+| 11 | 41–43 | Architecture: the design loop, worked designs and case studies, ongoing routine |
+
+**Only one week?** Do lessons 1–24 (stages 1–6, the platform itself) at about 4 hours a day, then lesson 41 ("The design loop"). Continue the rest at one lesson a day. Going slower is fine. Doing the lessons **in order**, with the recall step, is what matters.
+
+## What's in here (for reference)
+
+The path pulls from these. You can also use them directly to look things up or for extra practice.
+
+| Part | What it is |
+|---|---|
+| [**Learning path**](path/learning-path.md) | The ordered syllabus above (source for the Learn tab) |
+| [**Concept atlas**](atlas/README.md) | 401 concepts in 13 domains, from TCP handshakes to PRA SS1/23. Each has *What*, *How it works*, *On GCP* and *Watch out*, tiered core / working / aware. It's a reference organised **by topic**, not a reading order |
+| [**How to architect**](guide/01-how-to-architect.md) | The design loop, the "if you choose X, you must handle Y" knock-on map, failure walks, the questions a bank review board asks, anti-patterns |
+| [**End-to-end journeys**](guide/02-end-to-end-journeys.md) | 9 walkthroughs following a request, identity, data, deployment, failure or agent task across a whole architecture |
+| [**Worked designs and case studies**](guide/03-worked-designs-and-case-studies.md) | A full worked AI-underwriting design, plus Google's 4 official Professional Cloud Architect case studies analysed |
+| [**Practice resources**](guide/04-practice-resources.md) | The best online practice material (Architecture Center, Well-Architected FSI, FINOS, OWASP…), each with an exercise |
+| [**Design lab**](practice/design-lab.md) · [**Design reviews**](practice/design-reviews.md) | 7 briefs with 58 graded decisions and twists; 8 flawed proposals to critique |
+| [**Architecture library**](practice/architectures.md) · [**Scenarios**](practice/scenarios.md) | 18 bank and AI reference designs (used in hidden-label quizzes); 63 exam-style questions |
+| [`flashcards.csv`](flashcards.csv) | All concepts plus 95 original cards, for Anki |
+| [One-pager](00-gcp-on-one-page.md) · [cheat sheets](cheatsheets/) | The 8 lenses, service map, decision trees, design template, `gcloud` grammar |
+| [Hands-on labs](day-1-foundations.md) (`day-*.md`) | Optional, for when you have time to build: a Cloud Run app that grows through the week |
+
+### App tabs
+
+- **Learn:** the path. Start here, every time.
+- **Architect:** readings, journeys, design lab, design reviews (the path sends you here, and you can also browse freely).
+- **Atlas:** look up any concept, and rate yourself by domain.
+- **Flashcards:** spaced repetition. It defaults to the concepts you've studied.
+- **Diagrams:** 18 architectures with labels hidden.
+- **Scenarios:** 63 questions by topic.
+- **Progress:** lessons done, ratings by domain, your core gaps.
 
 ### How do you know nothing important is missing?
 
-The things you listed (perimeters, gRPC, ingress/egress, Apigee, ports, handshakes) were examples. The real risk is everything you *don't* know to ask about. So the atlas isn't a list of topics I picked. It was built bottom-up and then checked:
+The atlas was built bottom-up across 13 domains and cross-checked against Google's official exam guides (Associate Cloud Engineer, Professional Cloud Architect, Network, Security, Data, DevOps, Developer, ML Engineer, Generative AI Leader). 207 named services and concepts from those guides were searched for, and the gaps were filled. It's also tailored to UK banking (VPC-SC, CMEK/EKM, residency, operational resilience, SS2/21, SS1/23, Consumer Duty, UK GDPR) and the current AI stack (Agent Platform, ADK, Agent Runtime, MCP, A2A, Model Armor, RAG, evaluation). Rating yourself shows you what you don't know.
 
-1. **Layered from fundamentals up:** networking basics → GCP networking → identity → security and cryptography → compute → data theory and storage → data pipelines → APIs and distributed-systems patterns → reliability and operations → governance and cost → migration and hybrid → AI/ML/agents → UK banking regulation.
-2. **Cross-checked against Google's official exam guides** (current versions): Associate Cloud Engineer, Professional Cloud Architect, Cloud Network Engineer, Cloud Security Engineer, Data Engineer, Cloud DevOps Engineer, Cloud Developer, Machine Learning Engineer and Generative AI Leader. 207 named services and concepts from those guides were searched for in the atlas, and the gaps were filled. The atlas covers the *union* of what Google expects of architects, network, security, data, DevOps, developer and ML specialists, at the level of understanding you need, without the exam trivia.
-3. **Made specific to your job:** bank controls (VPC-SC, CMEK/EKM, Access Approval, data residency, org policies), UK regulation (operational resilience, SS2/21 outsourcing, SS1/23 model risk, Consumer Duty, UK GDPR) and the current AI stack (Agent Platform, ADK, Agent Runtime, MCP, A2A, Model Armor, RAG, evaluation).
-4. **Your unknown unknowns become visible:** rate every concept in the app. Anything you rate "New to me" or "Heard of it" goes on your gap list, so you can see exactly what you don't know.
-
-> **Naming note:** In April 2026 Google renamed Vertex AI to **Gemini Enterprise Agent Platform** (Agent Engine is now **Agent Runtime**, and Vertex AI Search is now **Agent Search**). Colleagues, SDKs and older docs still say "Vertex AI". The atlas uses both names.
+> **Naming note:** In April 2026 Google renamed Vertex AI to **Gemini Enterprise Agent Platform** (Agent Engine is now **Agent Runtime**, and Vertex AI Search is now **Agent Search**). Colleagues, SDKs and older docs still say "Vertex AI". The material uses both names.
 
 ## Opening the practice app
 
-- **As a hosted page (recommended):** use the private link Claude published for this repo. Progress saves to your claude.ai account, so it follows you between laptop and phone.
-- **Locally:** open `app/index.html` in a browser (download the file, or clone the repo). Progress is saved in that browser.
-- After editing the atlas, diagrams or questions, run `python3 tools/build.py` to rebuild the app, the atlas index and `flashcards.csv`.
+- **Hosted (recommended):** the private link Claude published for this repo. Progress saves to your claude.ai account.
+- **Locally:** open `app/index.html` in a browser. Progress is saved in that browser.
+- After editing any source (path, atlas, guides, practice files), run `python3 tools/build.py`. It rebuilds the app, the atlas index and `flashcards.csv`, and checks that the path covers every core and working concept.
 
-## The week (no building required, about 2.5–3 hours a day)
+## After the path
 
-Each day covers the **core** concepts of its domains carefully and skims *working* and *aware*. Day 5 brings everything together through architecture.
-
-| Day | Atlas domains (the pieces) | Put it together (Architect section) | Extra practice |
-|---|---|---|---|
-| **1** | [One-pager](00-gcp-on-one-page.md) · [01 Networking fundamentals](atlas/01-networking-fundamentals.md) · [03 Identity and access](atlas/03-identity-and-access.md) · [10 Governance and cost](atlas/10-governance-and-cost.md) | Read [How to architect](guide/01-how-to-architect.md) §1–5 · Journey: *Who is calling?* · Review: *"Quick win" GenAI pilot* | Diagram: *Static site and API* · scenarios: identity, governance |
-| **2** | [02 GCP networking](atlas/02-gcp-networking.md) · [04 Security and compliance](atlas/04-security-and-compliance.md) | Journeys: *On-prem app calls Gemini privately*, *One outbound call, fully controlled* · Lab: *Lift-and-shift* · Review: *Hybrid network* | Diagrams: *Hybrid landing zone*, *Secure data science* · scenarios: networking, security |
-| **3** | [05 Compute and containers](atlas/05-compute-and-containers.md) · [06 Storage and databases](atlas/06-storage-and-databases.md) · [07 Data processing](atlas/07-data-processing-and-messaging.md) | Journeys: *Core banking to a regulator's report*, *Scoring a payment in 100 ms* · Labs: *Real-time fraud*, *Governed analytics* · Review: *Self-service analytics* | Diagrams: *Three-tier HA*, *GKE mesh* · scenarios: compute, data |
-| **4** | [08 APIs and communication](atlas/08-apis-and-service-communication.md) · [09 Reliability and operations](atlas/09-reliability-and-operations.md) · [11 Migration](atlas/11-migration-and-hybrid.md) | Read §6–7 (knock-on map, failure walk) · Journeys: *Customer adds a payee and pays*, *A zone fails, then a region*, *A code change reaches production* · Labs: *Mobile payments*, *Partner API* · Reviews: *Payments "with HA"*, *DR plan*, *Delivery pipeline*, *KYC intake* | Diagrams: *Active-active payments*, *Open Banking* · scenarios: integration, reliability |
-| **5** | [12 AI, ML and agents](atlas/12-ai-ml-and-genai.md) · [13 UK banking regulation](atlas/13-uk-banking-regulation-and-risk.md) | Read §8–10 + the [worked mortgage design](guide/03-worked-designs-and-case-studies.md) · Journey: *An agent's task* · Labs: *Policy assistant (RAG)*, *Servicing agent* · Review: *Servicing agent v0.1* · then one [Google case study](guide/03-worked-designs-and-case-studies.md#part-2-googles-professional-cloud-architect-case-studies), designed by you first | Diagrams: *RAG assistant*, *Agentic servicing*, *Credit-risk MLOps* · scenarios: AI, regulation |
-
-### The daily loop
-
-```
- 0:00  Warm-up    (15m)  Re-read the one-pager. Do the flashcards that are due in the app
- 0:15  Rate       (30m)  In the atlas, go through today's domains, core tier first. Read each term, say out loud
-                         what it is, then rate yourself. Don't open the answers yet
- 0:45  Close gaps (60m)  Filter to "My gaps". Open each one, read it properly, follow the Related links,
-                         then re-rate. This is where the depth comes from
- 1:45  Combine    (40m)  Architect section: today's journey, then design lab, then review. This is the most
-                         important block. Reading builds the pieces, and this builds the skill of combining them
- 2:25  Recall     (20m)  Blank page: draw one of today's diagrams from memory and label every arrow.
-                         Write 5 lines on what surprised you
- 2:45  Work       (15m)  Find one of today's concepts in your bank's real environment or design docs
-```
-
-Why this works when courses didn't: you **recall before you read** (that's what makes memory stick), you only spend reading time on **your actual gaps**, and the journeys, labs and reviews make you **combine** the knowledge, which is what architecture reviews will ask of you. Fit the extra-practice column (diagram quizzes, scenarios) into the warm-up or the commute.
-
-### After the week
-
-- **Daily, 10 minutes:** due flashcards in the app (or Anki).
-- **Weekly:** one design lab or review, one Architecture Center kata (see [practice resources](guide/04-practice-resources.md)), and re-rate one domain.
-- **Each design you touch at work:** run it through the [solution design template](cheatsheets/solution-design-template.md) and the 8 lenses before the review.
-- **When you have time to build:** the `day-*.md` labs walk you through deploying a Cloud Run app with Firestore, Pub/Sub, BigQuery, Secret Manager and private networking. That's when the knowledge becomes muscle memory.
+- **Daily, 10 minutes:** due flashcards.
+- **Weekly:** one design lab or review, plus one Architecture Center kata (see [practice resources](guide/04-practice-resources.md)).
+- **Each design at work:** the [60-second checklist](guide/01-how-to-architect.md#10-a-60-second-mental-checklist-memorise-this) and the knock-on map before the review.
+- **When you have time to build:** the `day-*.md` labs, or the Cloud Resume Challenge.
 
 ## Repository layout
 
 ```
+path/         learning-path.md: the ordered syllabus (start here)
+atlas/        13 domain files + generated index (reference, by topic)
 guide/        how to architect, end-to-end journeys, worked designs + case studies, practice resources
-atlas/        13 domain files + generated index (the depth)
-practice/     architectures.md, scenarios.md, design-lab.md, design-reviews.md, week1-cards.csv
+practice/     architectures, scenarios, design lab, design reviews, week-1 cards
 app/          template.html (source) → index.html (built practice app)
-tools/        build.py: rebuilds app/index.html, atlas/README.md, flashcards.csv
+tools/        build.py: builds the app, atlas index and flashcards; validates the path
 cheatsheets/  decision trees, solution design template, gcloud patterns
-day-*.md      the original 5-day hands-on track (optional labs)
-lab/app/      the Cloud Run app used by the labs
+day-*.md      optional hands-on labs; lab/app/ is the Cloud Run app they use
 ```

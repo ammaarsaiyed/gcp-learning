@@ -201,6 +201,42 @@ th { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.06em; text
 .gaps button { border: 0; background: none; padding: 0; color: var(--accent); text-align: left; }
 .confirm { display: inline-flex; gap: 8px; align-items: center; }
 
+/* Learn */
+.learn-hero h2 { font-size: 1.9rem; }
+.continue { padding: 18px 20px; margin-bottom: 22px; border-left: 4px solid var(--accent); }
+.stages { display: grid; gap: 18px; }
+.stage-head { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: end; justify-content: space-between; margin-bottom: 8px; }
+.stage-head > div:first-child { flex: 1 1 360px; min-width: 0; }
+.stage-prog { display: grid; grid-template-columns: auto 120px; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; font-size: .85rem; color: var(--ink-2); }
+.lessons { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.lesson-row { width: 100%; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; text-align: left; padding: 9px 12px; border: 1px solid var(--rule); background: var(--sheet); border-radius: var(--radius); }
+.lesson-row:hover { border-color: var(--accent); }
+.lesson-row .ln { font-family: var(--f-mono); font-size: .8rem; color: var(--ink-2); text-align: center; }
+.lesson-row.done .ln { color: var(--good); font-weight: 700; }
+.lesson-row.done .lt { color: var(--ink-2); }
+.lesson-row.next { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.lesson-row .lt { font-weight: 600; }
+.lesson-row .lm { font-family: var(--f-mono); font-size: .75rem; color: var(--ink-2); }
+.pill { font-family: var(--f-mono); font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; background: var(--accent); color: var(--on-accent); padding: 1px 7px; border-radius: 999px; }
+.lp-bar { display: flex; gap: 3px; margin: 8px 0 14px; }
+.lp-bar .seg { flex: 1; height: 7px; border: 0; padding: 0; border-radius: 3px; background: var(--grid); }
+.lp-bar .seg.past { background: var(--accent-soft); }
+.lp-bar .seg.cur { background: var(--accent); }
+.lp-card { padding: 22px; display: grid; gap: 14px; max-width: 900px; }
+.lp-card .term { font-family: var(--f-display); font-stretch: 85%; font-weight: 800; font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.1; text-wrap: balance; }
+.goal { margin: 0; font-size: 1.08rem; max-width: 75ch; }
+.lp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.plain { margin: 6px 0 0; padding-left: 18px; }
+.plain li { margin-bottom: 3px; }
+.lp-nav { margin-top: 4px; }
+.lp-items { display: grid; gap: 10px; }
+.lp-item { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper); }
+.lp-item .ln { color: var(--ink-2); font-weight: 700; }
+.lp-item.done .ln { color: var(--good); }
+.lp-quiz { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper); }
+.lp-quiz .q { font-weight: 600; }
+.return-bar { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 64px); z-index: 4; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; background: var(--accent-soft); border: 1px solid var(--accent); border-radius: var(--radius); padding: 8px 12px; margin-bottom: 14px; }
+
 /* Architect */
 .ax-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
 .ax-card { text-align: left; padding: 18px; display: grid; gap: 8px; align-content: start; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); }
@@ -266,6 +302,7 @@ th { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.06em; text
   <div class="wrap">
     <div class="brand"><h1>GCP Field Atlas</h1><span class="sub" id="sync">progress: this browser</span></div>
     <nav class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" data-tab="learn">Learn</button>
       <button class="tab" role="tab" data-tab="architect">Architect</button>
       <button class="tab" role="tab" data-tab="atlas">Atlas</button>
       <button class="tab" role="tab" data-tab="cards">Flashcards</button>
@@ -290,12 +327,12 @@ const byId = Object.fromEntries(DATA.concepts.map(c => [c.id, c]));
 const domainById = Object.fromEntries(DATA.domains.map(d => [d.id, d]));
 const termIndex = new Map(DATA.concepts.map(c => [c.term.toLowerCase(), c.id]));
 
-function freshProgress() { return { v: 1, updated: 0, ratings: {}, srs: {}, scen: {}, arch: {}, labs: {}, reviews: {}, journeys: {} }; }
+function freshProgress() { return { v: 1, updated: 0, ratings: {}, srs: {}, scen: {}, arch: {}, labs: {}, reviews: {}, journeys: {}, path: {}, seen: {}, read: {} }; }
 let P = freshProgress();
 try { const s = localStorage.getItem(KEY); if (s) { const o = JSON.parse(s); if (o && o.v === 1) P = Object.assign(freshProgress(), o); } } catch (e) {}
 
 const UI = { tab: "atlas", domain: DATA.domains[0].id, tier: "all", status: "all", q: "", open: {},
-  deckDomain: "all", deckTier: "core", deckGaps: false, queue: null, qi: 0, flipped: false, done: 0,
+  deckDomain: "all", deckTier: Object.keys(P.seen || {}).length ? "path" : "core", deckGaps: false, queue: null, qi: 0, flipped: false, done: 0,
   arch: null, archMode: "quiz", archSel: null, archHard: false, archAns: {},
   scenDomain: "all", scenOrder: null, scenIdx: 0, scenPicked: null, scenShuffle: null, confirmReset: false };
 
@@ -358,6 +395,7 @@ async function connect() {
 
 /* ---------- tabs ---------- */
 function go(tab) {
+  if (tab === "learn" && UI.tab === "learn" && typeof LP !== "undefined") LP.view = "home";
   if (tab === "architect" && UI.tab === "architect" && typeof AX !== "undefined") AX.view = "home";
   UI.tab = tab;
   document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === tab)));
@@ -369,12 +407,15 @@ document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () =>
 
 function render() {
   const m = $("#main");
-  if (UI.tab === "architect") m.innerHTML = viewArchitect();
+  const back = UI.returnLesson && UI.tab !== "learn" && lessonById(UI.returnLesson.id) ? `<div class="return-bar"><span>Practising for lesson: <strong>${esc(lessonById(UI.returnLesson.id).title)}</strong></span><button class="btn small primary" data-lp="return">Back to lesson</button></div>` : "";
+  if (UI.tab === "learn") m.innerHTML = viewLearn();
+  else if (UI.tab === "architect") m.innerHTML = viewArchitect();
   else if (UI.tab === "atlas") m.innerHTML = viewAtlas();
   else if (UI.tab === "cards") m.innerHTML = viewCards();
   else if (UI.tab === "diagrams") m.innerHTML = viewDiagrams();
   else if (UI.tab === "scenarios") m.innerHTML = viewScenarios();
   else m.innerHTML = viewProgress();
+  if (back) m.insertAdjacentHTML("afterbegin", back);
 }
 
 /* ---------- Atlas ---------- */
@@ -443,7 +484,7 @@ function viewAtlas() {
 /* ---------- Flashcards (Leitner-style spaced repetition) ---------- */
 function deckConcepts() {
   return DATA.concepts.filter(c => (UI.deckDomain === "all" || c.domain === UI.deckDomain)
-    && (UI.deckTier === "all" || c.tier === UI.deckTier || (UI.deckTier === "core+working" && c.tier !== "aware"))
+    && (UI.deckTier === "all" || c.tier === UI.deckTier || (UI.deckTier === "core+working" && c.tier !== "aware") || (UI.deckTier === "path" && P.seen[c.id]))
     && (!UI.deckGaps || rating(c.id) === 0 || rating(c.id) === 1));
 }
 function buildQueue() {
@@ -464,6 +505,7 @@ function gradeCard(id, g) {
   touch(); render();
 }
 function viewCards() {
+  if (!UI.deckTierChosen && UI.deckTier !== "path" && Object.keys(P.seen).length) { UI.deckTier = "path"; UI.queue = null; }
   if (!UI.queue) buildQueue();
   const cs = deckConcepts(), now = Date.now();
   const dueN = cs.filter(c => P.srs[c.id] && P.srs[c.id].due <= now).length;
@@ -499,7 +541,7 @@ function viewCards() {
       <label class="eyebrow" for="dd">Domain</label>
       <select id="dd">${opt("all", "All domains", UI.deckDomain)}${DATA.domains.map(d => opt(d.id, d.num + " · " + esc(d.title), UI.deckDomain)).join("")}</select>
       <label class="eyebrow" for="dt">Tiers</label>
-      <select id="dt">${opt("core", "Core only", UI.deckTier)}${opt("core+working", "Core + working", UI.deckTier)}${opt("all", "Everything", UI.deckTier)}</select>
+      <select id="dt">${opt("path", "Studied in the path", UI.deckTier)}${opt("core", "Core only", UI.deckTier)}${opt("core+working", "Core + working", UI.deckTier)}${opt("all", "Everything", UI.deckTier)}</select>
       <label class="row" style="gap:6px"><input type="checkbox" id="dg" ${UI.deckGaps ? "checked" : ""}> Only concepts I rated as gaps</label>
       <div class="stat"><span>Due now</span><strong>${dueN}</strong></div>
       <div class="stat"><span>New</span><strong>${newN}</strong></div>
@@ -690,6 +732,7 @@ function viewProgress() {
   const gaps = core.filter(c => rating(c.id) === 0 || rating(c.id) === 1);
   return `<h2>Progress</h2><p class="lede">The atlas is the map of what matters. This page shows how much of it you can explain, based on your own ratings, and where the gaps are.</p>
     <div class="tiles">
+      <div class="panel tile"><div class="eyebrow">Path lessons complete</div><div class="big">${DATA.path.flatMap(s => s.lessons).filter(l => P.path[l.id] && P.path[l.id].done).length}<span class="muted" style="font-size:1rem"> / ${DATA.path.flatMap(s => s.lessons).length}</span></div></div>
       <div class="panel tile"><div class="eyebrow">Core concepts you can explain</div><div class="big">${knownCore}<span class="muted" style="font-size:1rem"> / ${core.length}</span></div></div>
       <div class="panel tile"><div class="eyebrow">Concepts rated</div><div class="big">${rated}<span class="muted" style="font-size:1rem"> / ${all.length}</span></div></div>
       <div class="panel tile"><div class="eyebrow">Cards learned</div><div class="big">${learned}</div></div>
@@ -913,6 +956,144 @@ document.addEventListener("keydown", e => {
   if (e.key === "ArrowRight") axAction("jgo", AX.step + 1); else if (e.key === "ArrowLeft") axAction("jgo", AX.step - 1);
 });
 
+/* ---------- Learn: the guided path ---------- */
+const LESSONS = DATA.path.flatMap((st, si) => st.lessons.map(l => Object.assign({ stage: st, stageNum: si + 1 }, l)));
+const LP = { view: "home", id: null, step: 0, revealed: false, qpick: {}, qorder: {} };
+function lessonById(id) { return LESSONS.find(l => l.id === id); }
+function lessonDone(l) { return !!(P.path[l.id] && P.path[l.id].done); }
+function nextLesson() { return LESSONS.find(l => !lessonDone(l)) || null; }
+function lessonSteps(l) { return ["intro"].concat(l.concepts.map(c => "c:" + c), ["practice", "checkpoint"]); }
+function practiceDone(it) {
+  if (it.kind === "quiz") return !!P.scen[it.ref];
+  if (it.kind === "diagram") return !!P.arch[it.ref];
+  if (it.kind === "journey") return !!P.journeys[it.ref];
+  if (it.kind === "lab") return !!P.labs[it.ref];
+  if (it.kind === "review") return !!P.reviews[it.ref];
+  if (it.kind === "read") return !!P.read[it.ref];
+  return false;
+}
+function practiceTitle(it) {
+  if (it.kind === "diagram") return DATA.architectures.find(a => a.id === it.ref).title;
+  if (it.kind === "journey") return DATA.journeys.find(a => a.id === it.ref).title;
+  if (it.kind === "lab") return DATA.labs.find(a => a.id === it.ref).title;
+  if (it.kind === "review") return DATA.reviews.find(a => a.id === it.ref).title;
+  if (it.kind === "read") return DATA.guides.find(a => a.id === it.ref).title;
+  return "";
+}
+const KIND_LABEL = { diagram: "Name the parts", journey: "Journey", lab: "Design lab", review: "Design review", read: "Read" };
+function lpHome() {
+  const nl = nextLesson(), done = LESSONS.filter(lessonDone).length;
+  const leftMin = LESSONS.filter(l => !lessonDone(l)).reduce((s, l) => s + l.minutes, 0);
+  const due = Object.values(P.srs).filter(s => s.due <= Date.now()).length;
+  const cont = nl ? `<div class="panel continue">
+      <div class="eyebrow">${done ? "Continue where you left off" : "Start here"} · Stage ${nl.stageNum}: ${esc(nl.stage.title)}</div>
+      <h2 style="margin:4px 0">${esc(nl.title)}</h2>
+      <p class="muted" style="margin:0 0 10px">About ${nl.minutes} minutes · ${nl.concepts.length} concepts · ${nl.practice.length} practice items</p>
+      <div class="row"><button class="btn primary" data-lp="open" data-arg="${nl.id}">${done ? "Continue: next lesson" : "Start lesson 1"}</button>
+      ${due ? `<button class="btn" data-lp="cards">Review ${due} due flashcards first</button>` : ""}</div></div>`
+    : `<div class="panel continue"><h2>Path complete</h2><p class="muted">Keep the routine going: flashcards daily, labs and reviews weekly, and a case study monthly (lesson 43).</p></div>`;
+  const stages = DATA.path.map((st, si) => {
+    const ls = LESSONS.filter(l => l.stage === st), d = ls.filter(lessonDone).length;
+    return `<section class="stage"><div class="stage-head"><div><div class="eyebrow">Stage ${si + 1}</div><h3>${esc(st.title)}</h3><p class="muted" style="margin:2px 0 0">${esc(st.summary)}</p></div>
+        <div class="stage-prog"><span>${d}/${ls.length}</span><div class="bar"><span style="width:${pct(d, ls.length)}%"></span></div></div></div>
+      <ol class="lessons">${ls.map(l => { const n = LESSONS.indexOf(l) + 1, isNext = nl && nl.id === l.id; return `<li><button class="lesson-row ${lessonDone(l) ? "done" : ""} ${isNext ? "next" : ""}" data-lp="open" data-arg="${l.id}">
+          <span class="ln">${lessonDone(l) ? "✓" : n}</span><span class="lt">${esc(l.title)}</span><span class="lm">${l.minutes} min</span>${isNext ? `<span class="pill">next</span>` : ""}</button></li>`; }).join("")}</ol></section>`;
+  }).join("");
+  return `<div class="learn-hero"><div class="eyebrow">Learning path</div><h2>From zero to designing bank-grade systems, in order</h2>
+      <p class="lede">${LESSONS.length} short lessons in ${DATA.path.length} stages, about ${Math.round(LESSONS.reduce((s, l) => s + l.minutes, 0) / 60)} hours in total. Each lesson builds on the ones before it: a framing of why it matters, then concepts one at a time (explain each to yourself before revealing it), then practice that combines them with earlier lessons, then a checkpoint question. Concepts you study join your flashcard deck automatically.</p>
+      <p class="muted" style="margin:-6px 0 16px">${done} of ${LESSONS.length} lessons complete · about ${Math.round(leftMin / 60)} h to go. The Atlas, Diagrams and Scenarios tabs are references for looking things up. The path is the order to learn them in.</p></div>
+    ${cont}<div class="stages">${stages}</div>`;
+}
+function lpLesson() {
+  const l = lessonById(LP.id), steps = lessonSteps(l), cur = steps[LP.step], n = LESSONS.indexOf(l) + 1;
+  const bar = `<div class="lp-bar">${steps.map((s, k) => `<button class="seg ${k < LP.step ? "past" : k === LP.step ? "cur" : ""}" data-lp="go" data-arg="${k}" aria-label="Step ${k + 1}"></button>`).join("")}</div>`;
+  const nav = (nextLabel, extra = "") => `<div class="row lp-nav"><button class="btn" data-lp="go" data-arg="${LP.step - 1}" ${LP.step ? "" : "disabled"}>Back</button>${extra}<button class="btn primary" data-lp="go" data-arg="${LP.step + 1}">${nextLabel}</button></div>`;
+  let body;
+  if (cur === "intro") {
+    body = `<div class="panel lp-card"><div class="eyebrow">Why this matters</div><p class="goal">${md(l.goal)}</p>
+      <div class="lp-cols"><div><div class="eyebrow">You'll learn</div><ul class="plain">${l.concepts.map(id => `<li>${esc(byId[id].term)} <span class="tier ${byId[id].tier}">${byId[id].tier}</span>${P.seen[id] ? ' <span class="muted">· studied</span>' : ""}</li>`).join("")}</ul></div>
+      <div><div class="eyebrow">Then you'll practise</div><ul class="plain">${l.practice.map(it => `<li>${it.kind === "quiz" ? "Scenario question" : KIND_LABEL[it.kind] + ": " + esc(practiceTitle(it))}</li>`).join("")}</ul></div></div>
+      ${nav("Begin")}</div>`;
+  } else if (cur.startsWith("c:")) {
+    const c = byId[cur.slice(2)], idx = l.concepts.indexOf(c.id) + 1, r = rating(c.id);
+    body = `<div class="panel lp-card"><div class="row"><span class="eyebrow">Concept ${idx} of ${l.concepts.length} · ${esc(domainById[c.domain].title)}</span><span class="tier ${c.tier}">${c.tier}</span></div>
+      <div class="term">${esc(c.term)}</div>
+      ${LP.revealed ? `<div class="detail" style="margin:0">
+          <p><span class="lbl">What</span>${md(c.what)}</p>
+          ${c.how ? `<p><span class="lbl">How it works</span>${md(c.how)}</p>` : ""}
+          ${c.gcp ? `<p><span class="lbl">On GCP</span>${md(c.gcp)}</p>` : ""}
+          ${c.why ? `<p><span class="lbl">Why it matters</span>${md(c.why)}</p>` : ""}
+          ${c.watch ? `<p class="watch"><span class="lbl">Watch out</span>${md(c.watch)}</p>` : ""}
+          ${c.related.length ? `<p class="muted" style="font-size:.9rem"><span class="lbl">Connects to</span>${c.related.map(esc).join(" · ")}</p>` : ""}
+        </div>
+        <div><div class="eyebrow" style="margin-bottom:4px">How well could you explain it before revealing?</div>
+        <div class="rate" role="group" aria-label="Rate ${esc(c.term)}">${RATINGS.map((t, i) => `<button data-rate="${c.id}" data-v="${i}" aria-pressed="${r === i}">${t}</button>`).join("")}</div></div>
+        ${nav(idx === l.concepts.length ? "On to practice" : "Next concept")}`
+      : `<p class="prompt muted">Before revealing: say out loud what you think it is, how it works, and where you'd meet it on Google Cloud. Guessing is fine. Trying to recall it first is what makes it stick.</p>
+        <div class="row lp-nav"><button class="btn" data-lp="go" data-arg="${LP.step - 1}">Back</button><button class="btn primary" data-lp="reveal">Reveal</button></div>`}
+    </div>`;
+  } else if (cur === "practice") {
+    const items = l.practice.map(it => {
+      if (it.kind === "quiz") {
+        const q = DATA.scenarios.find(x => x.id === it.ref);
+        if (!LP.qorder[q.id]) LP.qorder[q.id] = shuffle(q.options.map((_, k) => k));
+        const pk = LP.qpick[q.id];
+        return `<div class="lp-quiz"><div class="eyebrow">Scenario question</div><div class="q">${md(q.q)}</div>
+          <div class="opts" style="grid-template-columns:1fr">${LP.qorder[q.id].map(k => { const o = q.options[k]; let cls = "opt"; if (pk !== undefined) { if (o.correct) cls += " right"; else if (k === pk) cls += " wrong"; } return `<button class="${cls}" data-lq="${q.id}" data-arg="${k}" ${pk !== undefined ? "disabled" : ""} style="font-weight:400">${md(o.text)}</button>`; }).join("")}</div>
+          ${pk !== undefined ? `<div class="explain"><strong>${q.options[pk].correct ? "Correct." : "Not quite."}</strong> ${md(q.explain)}</div>` : ""}</div>`;
+      }
+      return `<div class="lp-item ${practiceDone(it) ? "done" : ""}"><span class="ln">${practiceDone(it) ? "✓" : "○"}</span><div><div class="eyebrow">${KIND_LABEL[it.kind]}</div><strong>${esc(practiceTitle(it))}</strong></div>
+        <button class="btn small" data-lp="openitem" data-kind="${it.kind}" data-arg="${it.ref}">${practiceDone(it) ? "Open again" : "Open"}</button></div>`;
+    }).join("");
+    body = `<div class="panel lp-card"><div class="eyebrow">Use it</div><p style="margin:0">Practice that combines this lesson's concepts with earlier ones. Items open in their own section, with a button to bring you back here.</p>
+      <div class="lp-items">${items}</div>${nav("On to the checkpoint")}</div>`;
+  } else {
+    const nl = LESSONS[n] || null;
+    body = `<div class="panel lp-card"><div class="eyebrow">Checkpoint</div><p class="goal" style="font-weight:600">${md(l.checkpoint)}</p>
+      <p class="muted" style="margin:0">Say it out loud or write 3–5 sentences without looking. If you get stuck, step back to the concept you're missing (use the bar above). That gap is exactly what to fix.</p>
+      ${lessonDone(l) ? `<p style="margin:0"><span class="gchip best">Lesson complete</span></p>` : ""}
+      <div class="row lp-nav"><button class="btn" data-lp="go" data-arg="${LP.step - 1}">Back</button>
+        ${lessonDone(l) ? "" : `<button class="btn primary" data-lp="complete">Mark lesson complete</button>`}
+        ${lessonDone(l) && nl ? `<button class="btn primary" data-lp="open" data-arg="${nl.id}">Next lesson: ${esc(nl.title)}</button>` : ""}
+        <button class="btn" data-lp="home">Path overview</button></div></div>`;
+  }
+  return `<div class="row" style="margin-bottom:10px"><button class="btn small" data-lp="home">Path overview</button><span class="eyebrow">Stage ${l.stageNum}: ${esc(l.stage.title)} · Lesson ${n} of ${LESSONS.length}</span></div>
+    <h2>${esc(l.title)}</h2>${bar}${body}`;
+}
+function viewLearn() { return LP.view === "lesson" ? lpLesson() : lpHome(); }
+function lpAction(act, arg, el) {
+  if (act === "home") { LP.view = "home"; }
+  else if (act === "open") { LP.view = "lesson"; LP.id = arg; LP.step = 0; LP.revealed = false; LP.qpick = {}; LP.qorder = {}; UI.returnLesson = null; }
+  else if (act === "go") { const st = lessonSteps(lessonById(LP.id)); LP.step = Math.max(0, Math.min(st.length - 1, +arg)); LP.revealed = false;
+    const cur = st[LP.step]; if (cur.startsWith("c:") && P.seen[cur.slice(2)]) LP.revealed = true; }
+  else if (act === "reveal") {
+    LP.revealed = true; const cid = lessonSteps(lessonById(LP.id))[LP.step].slice(2);
+    if (!P.seen[cid]) { P.seen[cid] = true; if (!P.srs[cid]) P.srs[cid] = { box: 0, due: Date.now() + DAY }; touch(); }
+    render(); return;
+  }
+  else if (act === "complete") { P.path[LP.id] = { done: true, at: Date.now() }; touch(); }
+  else if (act === "cards") { UI.deckTier = "path"; UI.queue = null; go("cards"); return; }
+  else if (act === "openitem") {
+    UI.returnLesson = { id: LP.id, step: LP.step };
+    const kind = el.dataset.kind;
+    if (kind === "diagram") { UI.arch = arg; UI.archAns = {}; UI.archSel = null; UI.optCache = {}; UI.lastPick = null; UI.archMode = "quiz"; go("diagrams"); return; }
+    if (kind === "read") { P.read[arg] = true; touch(); AX.view = "guide"; AX.id = arg; }
+    if (kind === "journey") { AX.view = "journey"; AX.id = arg; AX.step = 0; }
+    if (kind === "lab") { axAction("lab", arg); }
+    if (kind === "review") { AX.view = "review"; AX.id = arg; AX.checks = {}; AX.submitted = false; AX.order = null; }
+    go("architect"); return;
+  }
+  else if (act === "return") { const r = UI.returnLesson; UI.returnLesson = null; LP.view = "lesson"; LP.id = r.id; LP.step = r.step; LP.revealed = false; go("learn"); return; }
+  render(); window.scrollTo(0, 0);
+}
+document.addEventListener("click", e => {
+  const q = e.target.closest("[data-lq]");
+  if (q) { const qid = q.dataset.lq, k = +q.dataset.arg, sc = DATA.scenarios.find(x => x.id === qid);
+    LP.qpick[qid] = k; const prev = P.scen[qid] || { n: 0, right: 0 }; P.scen[qid] = { n: prev.n + 1, right: prev.right + (sc.options[k].correct ? 1 : 0), last: sc.options[k].correct }; touch(); render(); return; }
+  const t = e.target.closest("[data-lp]"); if (!t) return;
+  lpAction(t.dataset.lp, t.dataset.arg, t);
+});
+
 /* ---------- events ---------- */
 function jump(id) {
   const c = byId[id]; if (!c) return;
@@ -970,14 +1151,14 @@ document.addEventListener("change", e => {
   const id = e.target.id;
   if (id === "domselect") { UI.domain = e.target.value; UI.q = ""; render(); }
   else if (id === "dd") { UI.deckDomain = e.target.value; buildQueue(); render(); }
-  else if (id === "dt") { UI.deckTier = e.target.value; buildQueue(); render(); }
+  else if (id === "dt") { UI.deckTierChosen = true; UI.deckTier = e.target.value; buildQueue(); render(); }
   else if (id === "dg") { UI.deckGaps = e.target.checked; buildQueue(); render(); }
   else if (id === "hard") { UI.archHard = e.target.checked; render(); }
   else if (id === "sd") { UI.scenDomain = e.target.value; UI.scenOrder = null; render(); }
 });
 
 const start = (location.hash || "").slice(1);
-go(["architect", "atlas", "cards", "diagrams", "scenarios", "progress"].includes(start) ? start : "architect");
+go(["learn", "architect", "atlas", "cards", "diagrams", "scenarios", "progress"].includes(start) ? start : "learn");
 if (P.updated) setSync("progress: this browser");
 connect();
 </script>
